@@ -1,6 +1,8 @@
-/templates/**/*.png
-/templates/**/*.pdf
-/templates/**/*.ttf
+templates/**/*.png
+templates/**/*.pdf
+templates/**/*.ttf
 .idea/
 /*.png
 GazpromTemplate.iml
+temp/
+*.pyc

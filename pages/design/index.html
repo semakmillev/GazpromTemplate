@@ -1,11 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <script src="vue.js"></script>
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
     <script src="bootstrap/js/jquery-3.3.1.min.js"></script>
     <script src="bootstrap/js/bootstrap.min.js"></script>
+    <!--
+    <link rel="stylesheet" href="codemirror/lib/codemirror.css">
+    <script src="codemirror/lib/codemirror.js"></script>
+    <script src="codemirror/addon/edit/matchbrackets.js"></script>
+    <script src="codemirror/python/python.js"></script>
+    <style type="text/css">.CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}</style>
+    -->
 </head>
 <body>
 <script>
@@ -23,8 +30,8 @@
                     <h4 class="modal-title">{{selectedTemplate}}</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
-                <div class="modal-body">
-                    <div class="input-group mb-3">
+                <div class="modal-body" id="inputTemplateCode">
+                    <div class="input-group mb-3" >
                         <textarea class="form-control" placeholder="Введите код шаблона" rows="25"
                                   style="overflow-y: scroll;" v-model="template_code"></textarea>
                     </div>
@@ -39,27 +46,25 @@
     </div>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-lg-2">
+            <div class="col-lg-2 mr-0 pr-1">
                 <div class="input-group mb-3">
                     <input type="number" class="form-control" placeholder="Ширина" v-model="template_width">
                 </div>
             </div>
-            <div class="col-lg-2">
+            <div class="col-lg-2 ml-0 mr-0 pl-0 pr-1">
                 <div class="input-group mb-3">
                     <input type="number" class="form-control" placeholder="Высота" v-model="template_height">
                 </div>
             </div>
-            <div class="col-lg-2">
+            <div class="col-lg-2 ml-0 mr-0 pl-0 pr-0 pr-1">
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" placeholder="Выбранный шаблон" id="template"
                            v-model="selectedTemplate">
                 </div>
             </div>
-            <div class="col-lg-1">
+            <div class="col-lg-2 ml-0 mr-0 pl-0 pr-0">
                 <button type="button" class="btn btn-primary" v-on:click="downloadTemplate()">Выгрузить</button>
-            </div>
-            <div class="col-lg-1">
-                <button type="button" class="btn btn-primary" v-on:click="editCode()">Редактировать</button>
+                <button type="button" class="btn btn-danger" v-on:click="editCode()">Редактировать</button>
             </div>
         </div>
         <h3>Шаблоны</h3>
@@ -78,6 +83,8 @@
     </div>
 </div>
 <script>
+
+
     String.prototype.replaceAll = function (target, replacement) {
         return this.split(target).join(replacement);
     };
@@ -121,6 +128,7 @@
                     data: []
                 }).done(function (dt) {
                     main.template_code = dt;
+                    console.log(dt);
                     $('#myModal').modal('show');
                 });
 

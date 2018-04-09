@@ -24,16 +24,17 @@ class Layer(object):
 
 
 class TextLayer(Layer):
-    def __init__(self, font_place, font_size, font_color, text):
+    def __init__(self, font_place, font_size, font_color, text, align="left"):
         super(TextLayer, self).__init__()
         self.font = truetype(font=font_place, size=font_size)
         self.font_color = font_color
         self.text = text
         self.__x = 0
         self.__y = 0
+        self.align = align
 
     def get_x(self):
-        return self.__x
+        return self.__x if self.align == "left" else Layer.image_width - (self.__x + self.width)
 
     def set_x(self, x):
         self.__x = x
@@ -47,11 +48,19 @@ class TextLayer(Layer):
 
     def add_to_image(self, image):
         draw = Draw(image)
-        draw.text((self.x, self.y), self.text, self.font_color, font=self.font)
+        draw.multiline_text((self.x, self.y), self.text, self.font_color, font=self.font, align=self.align)
         return image
+
+    def get_height(self):
+        return self.font.getsize(self.text)[1]
+
+    def get_width(self):
+        return self.font.getsize(max(self.text.split("\n"), key=len))[0]
 
     x = property(get_x, set_x)
     y = property(get_y, set_y)
+    height = property(get_height)
+    width = property(get_width)
 
 
 class ImageLayer(Layer):
