@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
 import main
-import yaml
 from flask import Flask, request, Response, jsonify, send_file
 import os
 
@@ -12,7 +11,7 @@ app = Flask(__name__)
 
 
 def root_dir():  # pragma: no cover
-    return os.path.abspath(os.path.dirname(__file__)) + "\\pages"
+    return os.path.abspath(os.path.dirname(__file__)) + "/pages"
 
 
 def get_file(filename):  # pragma: no cover
@@ -49,18 +48,36 @@ def get_resource(path):  # pragma: no cover
     ), 200
 
 
-@app.route('/client/templatelist/', methods=['GET'])
+@app.route('/server/templatelist/', methods=['GET'])
 def get_template_list():
-    d = './templates'
+    d = os.path.abspath(os.path.dirname(__file__)) + '/templates'
     res = [{"name": o} for o in os.listdir(d) if os.path.isdir(os.path.join(d, o))]
     return jsonify(res)
+
+
+@app.route('/server/templatecode/<template_name>', methods=['GET'])
+def get_template_code(template_name):
+    file = open(os.path.abspath(os.path.dirname(__file__)) + '/templates/%s/template.py' % template_name)
+    # res = [{"name": o} for o in os.listdir(d) if os.path.isdir(os.path.join(d, o))]
+    return file.read()
+
+@app.route('/server/templatecode/<template_name>', methods=['POST'])
+def set_template_code(template_name):
+    print "%s" % request.data
+    #params = json.loads(request.data)
+    template_code = request.data
+    file = open(os.path.abspath(os.path.dirname(__file__)) + '/templates/%s/template.py' % template_name, 'w+')
+    # res = [{"name": o} for o in os.listdir(d) if os.path.isdir(os.path.join(d, o))]
+    file.write(template_code)
+    file.close()
+    return "OK" #file.read()
 
 
 @app.route('/server/<template_name>', methods=['POST'])
 def generate_template(template_name):
     params = json.loads(request.data)
-    main.generate_picture(template_name, params['width'], params['height'])
-    return send_file('res.png', mimetype="image/png")
+    file_name = main.generate_picture(template_name, params['width'], params['height'])
+    return send_file(file_name, mimetype="image/png")
 
 
 @app.after_request
@@ -73,4 +90,4 @@ def after_request(response):
 
 if __name__ == '__main__':
     ## host='0.0.0.0'
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5005)

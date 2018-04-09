@@ -1,4 +1,6 @@
-*.png
-*.pdf
-*.ttf
-files
+/templates/**/*.png
+/templates/**/*.pdf
+/templates/**/*.ttf
+.idea/
+/*.png
+GazpromTemplate.iml

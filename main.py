@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import imp
-
+import os
+import uuid
 
 
 def combine_layers(background, foreground_layer):
@@ -29,10 +30,14 @@ def combine_layers(background, foreground_layer):
 
 
 def generate_picture(template_name, width, height):
+    file_name = os.path.dirname(__file__)+"/"+str(uuid.uuid4())+".png"
+    f = open(file_name, 'a')
     from templates.Layer import Layer
     Layer.image_height = int(height)
     Layer.image_width = int(width)
-    foo = imp.load_source("Layer", "./templates/%s/template.py" % template_name)
+    a = os.path.abspath(os.path.dirname(__file__)) + "/templates/%s/template.py" % template_name
+    print a
+    foo = imp.load_source("Layer", a)
     layers = foo.layers
     final = layers[0].image
     i = 1
@@ -40,7 +45,9 @@ def generate_picture(template_name, width, height):
         print i
         i += 1
         final = combine_layers(final, layer)
-    final.save("res.png")
+    f.close()
+    final.save(file_name)
+    return file_name
 
 # layer1 = layers[0]
 
