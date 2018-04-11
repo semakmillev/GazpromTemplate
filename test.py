@@ -1,59 +1,67 @@
-# -*- coding: UTF-8 -*-
-# Эти три строчки всегда в начале шаблона под макет
-from math import trunc  # trunc - отбрасывание дробной части. Просто если делишь то используй этот оператор
+from PIL import Image, ImageCms, JpegImagePlugin, PngImagePlugin
+# from subprocess import call
+import piexif
 
-from templates.Layer import ImageLayer, TextLayer, Layer
-import os
+# call("exiftool.exe -XResolution=100 -YResolution=100 1.jpg")
 
-diagonal = Layer.get_diagonal()
-path = os.path.abspath(os.path.dirname(__file__))
-ratio = float(ImageLayer.image_width) / float(ImageLayer.image_height)
+im = Image.open("1.png")
+p = ImageCms.getOpenProfile("ISOcoated_v2_300_eci.icc")
+t = ImageCms.buildTransformFromOpenProfiles(ImageCms.get_display_profile(), "ISOcoated_v2_300_eci.icc", "RGBA", "CMYK")
+im = ImageCms.applyTransform(im, t)
+im.save("1.pdf", "PDF", resolution=200.0)
+'''
+im = Image.open("300.jpg")
+r = piexif.load("out.jpg")
+zeroth_ifd = {piexif.ImageIFD.Make: u"Canon",
+              piexif.ImageIFD.XResolution: (3000000, 10000),
+              piexif.ImageIFD.YResolution: (3000000, 10000),
+              piexif.ImageIFD.Software: u"piexif"
+              }
+exif_ifd = {piexif.ExifIFD.DateTimeOriginal: u"2099:09:29 10:10:10",
+            piexif.ExifIFD.LensMake: u"LensMake",
+            piexif.ExifIFD.Sharpness: 65535,
+            piexif.ExifIFD.LensSpecification: ((1, 1), (1, 1), (1, 1), (1, 1)),
+            }
+gps_ifd = {piexif.GPSIFD.GPSVersionID: (2, 0, 0, 0),
+           piexif.GPSIFD.GPSAltitudeRef: 1,
+           piexif.GPSIFD.GPSDateStamp: u"1999:99:99 99:99:99",
+           }
+first_ifd = {piexif.ImageIFD.Make: u"Canon",
+             piexif.ImageIFD.XResolution: (40, 1),
+             piexif.ImageIFD.YResolution: (40, 1),
+             piexif.ImageIFD.Software: u"piexif"
+             }
 
-# Здесь начинается описание шаблона
-layer1 = ImageLayer(path + '/G-Energy_2016_billboard_6x3_Desert_carbon.png')
-# есть 4 измерения top, bottom, left, right можно заполнить только два из них (т.е. мы отсчитываем только от одного угла)
-layer1.top = 0
-layer1.left = 0
-layer1.width = '100%'
-layer1.height = '100%'
+exif_dict = {"0th":zeroth_ifd, "Exif":exif_ifd, "GPS":gps_ifd, "1st":first_ifd}
+exif_bytes = piexif.dump(exif_dict)
+im.save("out.jpg", exif=exif_bytes)
+#et = exiftool.ExifTool("exiftool.exe")
 
-layer2 = ImageLayer(path + '/G-Energy_2016_Desert.png')
-layer2.top = 0
-layer2.right = int(-5000000 / (Layer.image_width ** 2)) if ratio < 1.5 else 0
-if ratio > 2:
-    layer2.height = '107%'
-elif ratio < 1.5:
-    layer2.height = '95%'
-else:
-    layer2.height = '100%'
-layer2.width = 'auto'
+im = Image.open("1.png", dpi = (100,100))
+im.info["dpi"] = (50.1, 50.1)
+im.save("1.png", dpi=(40.,40.1))
+# final.save("res.png", dpi=80.1)
+p = ImageCms.getOpenProfile("ISOcoated_v2_300_eci.icc")
+t = ImageCms.buildTransformFromOpenProfiles(ImageCms.get_display_profile(), "ISOcoated_v2_300_eci.icc", "RGBA", "CMYK")
+im = ImageCms.applyTransform(im, t)
+im.save("1.jpg", dpi=(40.,40.1))
+'''
+# im.save('res.png', dpi=(600.0,600.0))
+# im = im.convert('CMYK')
+# im = Image.open('300.jpg')
+# i = 1
+# im.save("300_1.jpg", dpi=(500, 500))
+'''
 
-layer3 = ImageLayer(path + '/G-Energy_2016_billboard_6x3_Desert_logo.png')
-layer3.width = trunc(0.25 * diagonal)
-# auto значит что сохраняются пропорции, но ведущей является другое измерение
-layer3.height = 'auto'
-x = trunc(layer3.height * 0.395)
-layer3.top = 0
-layer3.right = x * 2
+dp = ImageCms.get_display_profile()
+pRGBA = ImageCms.createProfile("LAB")
 
-layer4 = ImageLayer(path + '/G-Energy-F-Synth-5W-40-4L.png')
-layer4.height = trunc(0.207 * diagonal)
-layer4.width = 'auto'
-layer4.bottom = trunc(x * 0.769)
-layer4.left = trunc(x * 1.698)
 
-headtext_layer = TextLayer(font_place=path + "/DINProBold.ttf",
-                           font_size=trunc(float(Layer.image_height) * 0.09), font_color=(255, 255, 255),
-                           text=u"АДАПТАЦИЯ\nК ЛЮБОЙ\nСИТУАЦИИ")
-headtext_layer.x = x * 2
-headtext_layer.y = layer3.height
+im = ImageCms.applyTransform(im, t)
+im.save("0.jpg", "JPEG")
+'''
+# im.save("2.jpg", icc_profile=p.profile)
 
-wwwtext_layer = TextLayer(font_place=path + "/DINProMedium.ttf",
-                          font_size=trunc(float(Layer.image_height) * 0.05), font_color=(255, 255, 255),
-                          text=u"g-energy.org")
-wwwtext_layer.x = Layer.image_width - x * 2
-wwwtext_layer.y = Layer.image_height - x
-
-# здесь просто разом объединить все layer в один массив
-layers = [layer1, layer2, layer3, layer4, headtext_layer, wwwtext_layer]
-# layers = [layer1, layer2, layer3, layer4]
+# f = open("tmp.icc","a")
+# f.write(icc)
+# f.close()

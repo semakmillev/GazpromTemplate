@@ -50,7 +50,7 @@ headtext_layer.y = layer3.height
 
 wwwtext_layer = TextLayer(font_place=path + "/DINProMedium.ttf",
                           font_size=trunc(float(Layer.image_height)*0.05), font_color=(255, 255, 255),
-                          text=u"g-energy.org\nхуец\nхуец\nхуец\nхуец\nхуец\nхуец\nхуец", align="right")
+                          text=u"g-energy.org", align="right")
 wwwtext_layer.x = x*2
 wwwtext_layer.y = Layer.image_height - x
 

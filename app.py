@@ -76,8 +76,8 @@ def set_template_code(template_name):
 @app.route('/server/<template_name>', methods=['POST'])
 def generate_template(template_name):
     params = json.loads(request.data)
-    file_name = main.generate_picture(template_name, params['width'], params['height'])
-    return send_file(file_name, mimetype="image/png")
+    file_name = main.generate_picture(template_name, params['width'], params['height'], "PDF")
+    return send_file(file_name)
 
 
 @app.after_request

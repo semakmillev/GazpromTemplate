@@ -149,7 +149,7 @@
                 http.responseType = "blob";
                 http.onload = function () {
                     if (this.status === 200) {
-                        var filename = main.selectedTemplate + "_" + main.template_width + "x" + main.template_height + ".png";
+                        var filename = main.selectedTemplate + "_" + main.template_width + "x" + main.template_height + ".pdf";
                         var disposition = http.getResponseHeader('Content-Disposition');
                         if (disposition && disposition.indexOf('attachment') !== -1) {
                             var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;

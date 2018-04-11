@@ -5,4 +5,8 @@ templates/**/*.ttf
 /*.png
 GazpromTemplate.iml
 temp/
+/*.jpg
 *.pyc
+exiftool.exe
+*.tiff
+*.pdf

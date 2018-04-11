@@ -3,6 +3,8 @@ import imp
 import os
 import uuid
 
+from PIL import ImageCms, ImageChops
+
 
 def combine_layers(background, foreground_layer):
     left = None
@@ -29,8 +31,9 @@ def combine_layers(background, foreground_layer):
     return background
 
 
-def generate_picture(template_name, width, height):
-    file_name = os.path.dirname(__file__)+"/"+str(uuid.uuid4())+".png"
+def generate_picture(template_name, width, height, output="JPEG", resolution=60.0):
+    extension = output.replace("JPEG","JPG").lower()
+    file_name = os.path.dirname(__file__) + "/" + str(uuid.uuid4()) + "." + extension
     f = open(file_name, 'a')
     from templates.Layer import Layer
     Layer.image_height = int(height)
@@ -46,10 +49,26 @@ def generate_picture(template_name, width, height):
         i += 1
         final = combine_layers(final, layer)
     f.close()
-    final.save(file_name)
+    # final = final.convert('RGB')
+    # final = final.convert('CMYK')
+
+    srgb = ImageCms.createProfile('sRGB')
+    from_ = ImageCms.get_display_profile()
+
+    transform = ImageCms.buildTransformFromOpenProfiles(from_, "ISOcoated_v2_300_eci.icc", "RGBA", "CMYK")
+    final = ImageCms.applyTransform(final, transform)
+
+    if output == "PDF":
+        final = ImageChops.invert(final)
+        final.save(file_name, output, resolution=resolution)
+    elif output == "TIFF":
+        final.save(file_name, output, resolution=resolution, compression='tiff_lzw')
+    # final.save(file_name, output)
     return file_name
 
+
 # layer1 = layers[0]
+
 
 
 
