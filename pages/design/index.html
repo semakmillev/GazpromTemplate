@@ -31,7 +31,7 @@
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body" id="inputTemplateCode">
-                    <div class="input-group mb-3" >
+                    <div class="input-group mb-3">
                         <textarea class="form-control" placeholder="Введите код шаблона" rows="25"
                                   style="overflow-y: scroll;" v-model="template_code"></textarea>
                     </div>
@@ -67,6 +67,16 @@
                 <button type="button" class="btn btn-danger" v-on:click="editCode()">Редактировать</button>
             </div>
         </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="btn-group" role="group"  aria-label="Basic example">
+                    <button type="button" class="btn btn-secondary" v-model="format">JPEG</button>
+                    <button type="button" class="btn btn-secondary" v-model="format">PDF</button>
+                    <button type="button" class="btn btn-secondary" v-model="format">TIFF</button>
+                </div>
+                <button type="button" class="btn btn-danger" v-on:click="wut()">Что тут?</button>
+            </div>
+        </div>
         <h3>Шаблоны</h3>
         <hr>
 
@@ -96,13 +106,17 @@
             selectedTemplate: "",
             template_height: 500,
             template_width: 1000,
-            template_code: ""
+            template_code: "",
+            format: "JPEG"
         },
         methods: {
             click: function (text) {
                 console.log(text);
                 this.selectedTemplate = text;
                 //model.message = 'New value';
+            },
+            wut: function(){
+                console.log(this.format);
             },
             saveTemplate: function () {
                 var code = this.template_code;
