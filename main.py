@@ -3,7 +3,7 @@ import imp
 import os
 import uuid
 from subprocess import call
-
+from time import sleep
 from PIL import ImageCms, ImageChops
 
 
@@ -65,8 +65,9 @@ def generate_picture(template_name, width, height, output="JPEG", resolution=60.
         final.save(file_name, output, resolution=resolution, compression='tiff_lzw')
     elif output == "JPEG":
         final.save(file_name, output)
-        print "exiftool -XResolution=%s -YResolution=%s %s"%(int(resolution), int(resolution), file_name)
-        call("exiftool -XResolution=%s -YResolution=%s %s"%(int(resolution), int(resolution), file_name))
+        sleep(0.1)
+        s = "exiftool -XResolution=%s -YResolution=%s %s"%(int(resolution), int(resolution), file_name)
+        call(s)
     # final.save(file_name, output)
     return file_name
 
