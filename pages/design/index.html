@@ -46,14 +46,19 @@
     </div>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-lg-2 mr-0 pr-1">
+            <div class="col-lg-1 mr-0 pr-1">
                 <div class="input-group mb-3">
                     <input type="number" class="form-control" placeholder="Ширина" v-model="template_width">
                 </div>
             </div>
-            <div class="col-lg-2 ml-0 mr-0 pl-0 pr-1">
+            <div class="col-lg-1 ml-0 mr-0 pl-0 pr-1">
                 <div class="input-group mb-3">
                     <input type="number" class="form-control" placeholder="Высота" v-model="template_height">
+                </div>
+            </div>
+            <div class="col-lg-1 ml-0 mr-0 pl-0 pr-1">
+                <div class="input-group mb-3">
+                    <input type="number" class="form-control" placeholder="DPI" v-model="dpi">
                 </div>
             </div>
             <div class="col-lg-2 ml-0 mr-0 pl-0 pr-0 pr-1">
@@ -62,19 +67,17 @@
                            v-model="selectedTemplate">
                 </div>
             </div>
-            <div class="col-lg-2 ml-0 mr-0 pl-0 pr-0">
+            <div class="col-lg-1 ml-0 mr-0 pl-0 pr-1">
+                <select class="custom-select" v-model="format">
+                    <option value="JPEG" selected>JPEG</option>
+                    <option value="PDF">PDF</option>
+                    <option value="TIFF">TIFF</option>
+                </select>
+            </div>
+            <div class="col-lg-4 ml-0 mr-0 pl-0 pr-0">
+
                 <button type="button" class="btn btn-primary" v-on:click="downloadTemplate()">Выгрузить</button>
                 <button type="button" class="btn btn-danger" v-on:click="editCode()">Редактировать</button>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="btn-group" role="group"  aria-label="Basic example">
-                    <button type="button" class="btn btn-secondary" v-model="format">JPEG</button>
-                    <button type="button" class="btn btn-secondary" v-model="format">PDF</button>
-                    <button type="button" class="btn btn-secondary" v-model="format">TIFF</button>
-                </div>
-                <button type="button" class="btn btn-danger" v-on:click="wut()">Что тут?</button>
             </div>
         </div>
         <h3>Шаблоны</h3>
@@ -107,7 +110,8 @@
             template_height: 500,
             template_width: 1000,
             template_code: "",
-            format: "JPEG"
+            format: "JPEG",
+            dpi: 96
         },
         methods: {
             click: function (text) {
@@ -115,7 +119,7 @@
                 this.selectedTemplate = text;
                 //model.message = 'New value';
             },
-            wut: function(){
+            wut: function () {
                 console.log(this.format);
             },
             saveTemplate: function () {
@@ -154,7 +158,14 @@
                 console.log(this.selectedTemplate);
                 console.log(this.template_width);
                 console.log(this.template_height);
-                var request_data = {"width": this.template_width, "height": this.template_height};
+                console.log(this.format);
+                var extension = this.format.replace("JPEG", "JPG").toLowerCase();
+                var request_data = {
+                    "width": this.template_width,
+                    "height": this.template_height,
+                    "format": this.format,
+                    "dpi": this.dpi
+                };
                 var http = new XMLHttpRequest();
                 http.open('POST', "../../server/" + this.selectedTemplate, true);
                 http.setRequestHeader("Content-type", "application/json; charset=utf-8");
@@ -163,7 +174,7 @@
                 http.responseType = "blob";
                 http.onload = function () {
                     if (this.status === 200) {
-                        var filename = main.selectedTemplate + "_" + main.template_width + "x" + main.template_height + ".pdf";
+                        var filename = main.selectedTemplate + "_" + main.template_width + "x" + main.template_height + "." + extension;
                         var disposition = http.getResponseHeader('Content-Disposition');
                         if (disposition && disposition.indexOf('attachment') !== -1) {
                             var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;

@@ -2,6 +2,7 @@
 import imp
 import os
 import uuid
+from subprocess import call
 
 from PIL import ImageCms, ImageChops
 
@@ -52,7 +53,6 @@ def generate_picture(template_name, width, height, output="JPEG", resolution=60.
     # final = final.convert('RGB')
     # final = final.convert('CMYK')
 
-    srgb = ImageCms.createProfile('sRGB')
     from_ = ImageCms.get_display_profile()
 
     transform = ImageCms.buildTransformFromOpenProfiles(from_, "ISOcoated_v2_300_eci.icc", "RGBA", "CMYK")
@@ -63,6 +63,9 @@ def generate_picture(template_name, width, height, output="JPEG", resolution=60.
         final.save(file_name, output, resolution=resolution)
     elif output == "TIFF":
         final.save(file_name, output, resolution=resolution, compression='tiff_lzw')
+    elif output == "JPEG":
+        final.save(file_name, output)
+        call("exiftool -XResolution=%s -YResolution=%s %s"%(int(resolution), int(resolution), file_name))
     # final.save(file_name, output)
     return file_name
 

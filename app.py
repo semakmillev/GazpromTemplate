@@ -5,7 +5,7 @@ from flask import Flask, request, Response, jsonify, send_file
 import os
 
 # prefix = d['SERVER-INFO']['PREFIX']
-
+from model import parse_template_request
 
 app = Flask(__name__)
 
@@ -61,22 +61,25 @@ def get_template_code(template_name):
     # res = [{"name": o} for o in os.listdir(d) if os.path.isdir(os.path.join(d, o))]
     return file.read()
 
+
 @app.route('/server/templatecode/<template_name>', methods=['POST'])
 def set_template_code(template_name):
     print "%s" % request.data
-    #params = json.loads(request.data)
+    # params = json.loads(request.data)
     template_code = request.data
     file = open(os.path.abspath(os.path.dirname(__file__)) + '/templates/%s/template.py' % template_name, 'w+')
     # res = [{"name": o} for o in os.listdir(d) if os.path.isdir(os.path.join(d, o))]
     file.write(template_code)
     file.close()
-    return "OK" #file.read()
+    return "OK"  # file.read()
 
 
 @app.route('/server/<template_name>', methods=['POST'])
 def generate_template(template_name):
     params = json.loads(request.data)
-    file_name = main.generate_picture(template_name, params['width'], params['height'], "PDF")
+    template_request = parse_template_request(params)
+    file_name = main.generate_picture(template_name, template_request.width, template_request.height,
+                                      template_request.format, float(template_request.dpi))
     return send_file(file_name)
 
 
