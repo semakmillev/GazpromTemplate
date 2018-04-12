@@ -65,6 +65,7 @@ def generate_picture(template_name, width, height, output="JPEG", resolution=60.
         final.save(file_name, output, resolution=resolution, compression='tiff_lzw')
     elif output == "JPEG":
         final.save(file_name, output)
+        print "exiftool -XResolution=%s -YResolution=%s %s"%(int(resolution), int(resolution), file_name)
         call("exiftool -XResolution=%s -YResolution=%s %s"%(int(resolution), int(resolution), file_name))
     # final.save(file_name, output)
     return file_name
