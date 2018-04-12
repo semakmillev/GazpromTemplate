@@ -55,7 +55,7 @@ def generate_picture(template_name, width, height, output="JPEG", resolution=60.
 
     from_ = ImageCms.get_display_profile()
 
-    transform = ImageCms.buildTransformFromOpenProfiles(from_, "ISOcoated_v2_300_eci.icc", "RGBA", "CMYK")
+    transform = ImageCms.buildTransformFromOpenProfiles("sRGB_Color_Space_Profile.icm", "ISOcoated_v2_300_eci.icc", "RGBA", "CMYK")
     final = ImageCms.applyTransform(final, transform)
 
     if output == "PDF":
