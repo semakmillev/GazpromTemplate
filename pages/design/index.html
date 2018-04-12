@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
     <script src="bootstrap/js/jquery-3.3.1.min.js"></script>
     <script src="bootstrap/js/bootstrap.min.js"></script>
+
     <!--
     <link rel="stylesheet" href="codemirror/lib/codemirror.css">
     <script src="codemirror/lib/codemirror.js"></script>
@@ -18,8 +19,34 @@
 <script>
 
 </script>
+<style>
+    .upload-drop-zone {
+        height: 200px;
+        border-width: 2px;
+        margin-bottom: 20px;
+    }
 
+    /* skin.css Style*/
+    .upload-drop-zone {
+        color: #ccc;
+        border-style: dashed;
+        border-color: #ccc;
+        line-height: 200px;
+        text-align: center
+    }
+
+    .upload-drop-zone.drop {
+        color: #222;
+        border-color: #222;
+    }
+</style>
+<style>
+    .tmp button {
+        background-color: red;
+    }
+</style>
 <div id="app">
+
     <br>
     <div id="myModal" class="modal fade" role="dialog">
         <div class="modal-dialog modal-lg">
@@ -35,10 +62,28 @@
                         <textarea class="form-control" placeholder="Введите код шаблона" rows="25"
                                   style="overflow-y: scroll;" v-model="template_code"></textarea>
                     </div>
+                    <hr>
+                    <!--------------------------->
+                    <ul class="list-goup" style="padding-left: 0px">
+
+                        <li v-for="file in files" class="list-group-item">
+                            <div class="row">
+                                <div class="col-lg-10">{{ file.name }}</div>
+                            </div>
+                        </li>
+                    </ul>
+                    <label class="btn btn-secondary btn-files mb-0">
+                        <div class="col-lg-11">Browse</div>
+                        <div class="col-lg-1">
+                            <input type="file" style="display: none;" @change="onFileChange" multiple>
+                        </div>
+                    </label>
+                    <button type="button" class="btn btn-danger" v-on:click="upload()">Загрузить!</button>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" v-on:click="saveTemplate()">Save</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
                 </div>
             </div>
 
@@ -80,6 +125,10 @@
                 <button type="button" class="btn btn-danger" v-on:click="editCode()">Редактировать</button>
             </div>
         </div>
+
+
+
+
         <h3>Шаблоны</h3>
         <hr>
 
@@ -95,9 +144,15 @@
         </div>
     </div>
 </div>
+
+<script src="bootstrap/js/dropzone.js"></script>
 <script>
-
-
+    $(".dropzone").dropzone({});
+    function drop(ev) {
+        ev.preventDefault();
+        //var data = ev.dataTransfer.getData("text");
+        //ev.target.appendChild(document.getElementById(data));
+    }
     String.prototype.replaceAll = function (target, replacement) {
         return this.split(target).join(replacement);
     };
@@ -111,7 +166,8 @@
             template_width: 1000,
             template_code: "",
             format: "JPEG",
-            dpi: 96
+            dpi: 96,
+            files: {}
         },
         methods: {
             click: function (text) {
@@ -119,9 +175,80 @@
                 this.selectedTemplate = text;
                 //model.message = 'New value';
             },
-            wut: function () {
-                console.log(this.format);
+            upload: function () {
+                var main = this;
+                //var arr = {1:1,2:2};
+                var chain = Promise.resolve();
+                var steps = -1;
+                //console.log(this.files)
+                new Promise(function (resolve) {
+                    for (var x = 0; x < main.files.length; x++) {
+                        //var files = main.files;
+                        chain = chain.then(function () {
+                            return new Promise(function (res) {
+                                steps++;
+                                var formData = new FormData();
+                                formData.append("file", main.files[steps])
+                                $.ajax({
+                                    type: "POST",
+                                    url: "../../server/upload/" + main.selectedTemplate,
+                                    //contentType: "text",
+                                    //dataType: "text",
+                                    data: formData,
+                                    processData: false,  // tell jQuery not to process the data
+                                    contentType: false  // tell jQuery not to set contentType
+                                }).done(function () {
+                                    res("SUCCESS");
+                                    if (steps == main.files.length - 1) {
+                                        resolve("SUCCESS")
+                                    }
+                                }).fail(function () {
+                                    res("ERR");
+                                });
+
+                            })
+
+                        });
+                    }
+                }).then(function () {
+                  main.files = [];
+                });
+
+
+                ///  formData.append("file", this.files[x]);
+
+
+                //formData.append('file', this.files[0]);
+                //formData.append('file1[]', this.files);
+
+
+                /*
+                 for (var i = 0; i < this.files.length; i++) {
+                 var file = this.files[i];
+                 $.ajax({
+                 type: "POST",
+                 url: "../../server/upload/"+this.selectedTemplate,
+                 //contentType: "text",
+                 //dataType: "text",
+                 data: formData,
+                 processData: false,  // tell jQuery not to process the data
+                 contentType: false,  // tell jQuery not to set contentType
+                 });
+                 }
+                 //3console.log(formData);
+                 /*
+                 */
+
+
             },
+            onFileChange(e)
+            {
+                this.files = e.target.files || e.dataTransfer.files;
+                if (!this.files.length)
+                    return;
+                //this.createImage(files[0]);
+            }
+            ,
             saveTemplate: function () {
                 var code = this.template_code;
                 console.log(code);
@@ -136,7 +263,8 @@
                 });
 
 
-            },
+            }
+            ,
             editCode: function () {
                 var main = this;
                 console.log(this.selectedTemplate);
@@ -214,7 +342,7 @@
                         }
                     }
                 };
-                //http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');            
+                //http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
                 http.onreadystatechange = function () {
 
                 }

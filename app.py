@@ -2,12 +2,19 @@
 import json
 import main
 from flask import Flask, request, Response, jsonify, send_file
+from werkzeug.utils import secure_filename
+
 import os
 
 # prefix = d['SERVER-INFO']['PREFIX']
 from model import parse_template_request
 
+UPLOAD_FOLDER = os.path.abspath(os.path.dirname(__file__)) + '/templates'
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
+# ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif','png', 'ttf'])
 
 
 def root_dir():  # pragma: no cover
@@ -81,6 +88,19 @@ def generate_template(template_name):
     file_name = main.generate_picture(template_name, template_request.width, template_request.height,
                                       template_request.format, float(template_request.dpi))
     return send_file(file_name)
+
+
+@app.route('/server/upload/<template_name>', methods=['POST'])
+def upload(template_name):
+    print "!"
+    if 'file' not in request.files:
+        print "!!!"
+    file = request.files['file']
+    filename = secure_filename(file.filename)
+    file.save(os.path.abspath(os.path.dirname(__file__)) + "/templates/" + template_name + "/" + filename)
+
+    # f.save(file)
+    return "1"
 
 
 @app.after_request

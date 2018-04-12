@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+<script src="bootstrap/js/jquery-3.3.1.min.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<div class="panel panel-info">
+    <div class="panel-body">
+        <div class="dropzone" id="dropzone"></div>
+
+    </div>
+</div>
+</div>
+<script src="bootstrap/js/dropzone.js"></script>
+<script>
+    $("#dropzone").dropzone({
+        url: "../../server/upload",
+        success: function(res, index){
+            console.log(res, index);
+        }
+    });
+</script>
+
+</body>
+</html>
