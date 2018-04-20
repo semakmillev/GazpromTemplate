@@ -3,11 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <script src="vue.js"></script>
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+
+
     <script src="bootstrap/js/jquery-3.3.1.min.js"></script>
+
     <script src="bootstrap/js/bootstrap.min.js"></script>
 
+
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
     <!--
+    <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script type="text/javascript" src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="codemirror/lib/codemirror.css">
     <script src="codemirror/lib/codemirror.js"></script>
     <script src="codemirror/addon/edit/matchbrackets.js"></script>
@@ -19,27 +25,7 @@
 <script>
 
 </script>
-<style>
-    .upload-drop-zone {
-        height: 200px;
-        border-width: 2px;
-        margin-bottom: 20px;
-    }
 
-    /* skin.css Style*/
-    .upload-drop-zone {
-        color: #ccc;
-        border-style: dashed;
-        border-color: #ccc;
-        line-height: 200px;
-        text-align: center
-    }
-
-    .upload-drop-zone.drop {
-        color: #222;
-        border-color: #222;
-    }
-</style>
 <style>
     .tmp button {
         background-color: red;
@@ -48,6 +34,125 @@
 <div id="app">
 
     <br>
+    <!--
+    <div class="modal fade" role="dialog" id="loginModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-body">
+                <div role="tabpanel">
+
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active"><a href="#uploadTab" aria-controls="uploadTab" role="tab" data-toggle="tab">Upload</a>
+
+                        </li>
+                        <li role="presentation"><a href="#browseTab" aria-controls="browseTab" role="tab" data-toggle="tab">Browse</a>
+
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="uploadTab">upload Tab</div>
+                        <div role="tabpanel" class="tab-pane" id="browseTab">browseTab</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    -->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-1 mr-0 pr-1">
+                <button type="button" class="btn btn-primary" v-on:click="openLogin()">Логин</button>
+            </div>
+            <div class="col-lg-10 mr-0 pr-1">
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!--
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+
+                    </button>
+                </div>
+                -->
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#loginPanel" role="tab">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#registerPanel" role="tab">Register</a>
+                        </li>
+                    </ul>
+
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="loginPanel" role="tabpanel">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="input-group mb-1 mt-1">
+                                        <input type="email" class="form-control" placeholder="Email"
+                                               id="loginEmail"
+                                               v-model="loginEmail">
+                                    </div>
+                                    <div class="input-group mb-1">
+                                        <input type="password" class="form-control" placeholder="Password"
+                                               id="loginPassword"
+                                               v-model="loginPassword">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <button type="button" class="btn btn-primary w-100" v-on:click="login()">Войти!
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="registerPanel" role="tabpanel">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="input-group mb-1 mt-1">
+                                        <input type="email" class="form-control" placeholder="Email"
+                                               id="registerEmail"
+                                               v-model="loginEmail">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-group mb-1">
+                                        <input type="password" class="form-control" placeholder="Password"
+                                               id="registerPassword"
+                                               v-model="registerPassword">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-group mb-1">
+                                        <input type="password" class="form-control" placeholder="Repeat Password"
+                                               id="repeatRegisterPassword"
+                                               v-model="repeatRegisterPassword">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <button type="button" class="btn btn-primary w-100" v-on:click="register()">
+                                        Регистрация
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary save">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!------->
     <div id="myModal" class="modal fade" role="dialog">
         <div class="modal-dialog modal-lg">
 
@@ -127,8 +232,6 @@
         </div>
 
 
-
-
         <h3>Шаблоны</h3>
         <hr>
 
@@ -154,6 +257,11 @@
         data: {
             items: [], //[{id: 1, name: 'semak'}, {id: 2, name: 'ter'}],
             selectedTemplate: "",
+            loginEmail: "",
+            loginPassword: "",
+            registerEmail: "",
+            registerPassword: "",
+            repeatRegisterPassword: "",
             template_height: 500,
             template_width: 1000,
             template_code: "",
@@ -203,7 +311,7 @@
                         });
                     }
                 }).then(function () {
-                  main.files = [];
+                    main.files = [];
                 });
 
 
@@ -273,6 +381,12 @@
 
             }
             ,
+            openLogin: function () {
+                $('#loginModal').modal('show');
+            },
+            register: function(){
+
+            },
             downloadTemplate: function () {
                 var main = this;
                 console.log(this.selectedTemplate);

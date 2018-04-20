@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <script src="vue.js"></script>
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <script src="bootstrap/js/jquery-3.3.1.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+
+    <!--
+    <link rel="stylesheet" href="codemirror/lib/codemirror.css">
+    <script src="codemirror/lib/codemirror.js"></script>
+    <script src="codemirror/addon/edit/matchbrackets.js"></script>
+    <script src="codemirror/python/python.js"></script>
+    <style type="text/css">.CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}</style>
+    -->
+</head>
+<body>
+<div id="app">
+
+    <br>
+    <div class="container-fluid">
+        <!--
+       <div class="row">
+
+           <div class="col-lg-1 mr-0 pr-1">
+               <div class="input-group mb-3">
+                   <input type="number" class="form-control" placeholder="Ширина" v-model="template_width">
+               </div>
+           </div>
+           <div class="col-lg-1 ml-0 mr-0 pl-0 pr-1">
+               <div class="input-group mb-3">
+                   <input type="number" class="form-control" placeholder="Высота" v-model="template_height">
+               </div>
+           </div>
+           <div class="col-lg-1 ml-0 mr-0 pl-0 pr-1">
+               <div class="input-group mb-3">
+                   <input type="number" class="form-control" placeholder="DPI" v-model="dpi">
+               </div>
+           </div>
+           <div class="col-lg-2 ml-0 mr-0 pl-0 pr-0 pr-1">
+               <div class="input-group mb-3">
+                   <input type="text" class="form-control" placeholder="Выбранный шаблон" id="template"
+                          v-model="selectedTemplate">
+               </div>
+           </div>
+           <div class="col-lg-1 ml-0 mr-0 pl-0 pr-1">
+               <select class="custom-select" v-model="format">
+                   <option value="JPEG" selected>JPEG</option>
+                   <option value="PDF">PDF</option>
+                   <option value="TIFF">TIFF</option>
+               </select>
+           </div>
+           <div class="col-lg-4 ml-0 mr-0 pl-0 pr-0">
+
+               <button type="button" class="btn btn-primary" v-on:click="downloadTemplate()">Выгрузить</button>
+               <button type="button" class="btn btn-danger" v-on:click="editCode()">Редактировать</button>
+           </div>
+       </div>
+
+       -->
+
+
+        <h3>Мастер таблиц</h3>
+        <hr>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-2">
+                    <input class="form-control" type="text" v-model="table_name">
+                </div>
+                <div class="col-lg-1">
+                    <button type="button" class="btn btn-primary" v-on:click="load()">Редактировать</button>
+                </div>
+                <div class="col-lg-1">
+                    <button type="button" class="btn btn-secondary" v-on:click="save()">Сохранить</button>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-lg-1">
+                    <button type="button" class="btn btn-primary" v-on:click="addRow()">Добавить</button>
+                </div>
+            </div>
+        </div>
+        <br>
+        <hr>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <h6>Имя поля</h6>
+                        </div>
+                        <div class="col-lg-3">
+                            <h6>Тип данных</h6>
+                        </div>
+                        <div class="col-lg-2">
+                            <h6>Первичный ключ</h6>
+                        </div>
+                        <div class="col-lg-1">
+                            <h6>Инкримент</h6>
+                        </div>
+                        <div class="col-lg-3">
+                            <h6>Дефолт</h6>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+                <ul id="v-for-object" class="list-goup" style="margin: 0px; padding-left: 0px">
+                    <div v-for="field in fields">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <input class="form-control" type="text" v-model="field.name">
+                                </div>
+                                <div class="col-lg-3">
+                                    <input class="form-control" type="text" v-model="field.type">
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" v-model="field.primary" id="primary1">
+                                        <label class="custom-control-label" for="primary1">Primary</label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-1">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" v-model="field.autoincrement" id="autoincrement1">
+                                        <label class="custom-control-label" for="autoincrement1">Autoinc</label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <input class="form-control" type="text" v-model="field.default">
+                                </div>
+                                <div class="col-lg-1">
+                                    <button type="button" class="btn btn-primary" v-on:click="deleteRow(field)">Удалить
+                                    </button>
+                                </div>
+                            </div>
+                            <hr>
+                        </div>
+                    </div>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    String.prototype.replaceAll = function (target, replacement) {
+        return this.split(target).join(replacement);
+    };
+    var app = new Vue({
+        el: '#app',
+        data: {
+            table_name: "people",
+            fields: [
+            ] //[{id: 1, name: 'semak'}, {id: 2, name: 'ter'}],
+
+        },
+        methods: {
+            addRow: function () {
+                var nextOrder = this.fields.length + 1;
+                this.fields.push({
+                    order: nextOrder,
+                    name: "",
+                    type: "",
+                    primary: false,
+                    autoincrement: false,
+                    default: ""
+                });
+            },
+            deleteRow: function (row) {
+                console.log(row);
+                this.rows.splice(this.fields.indexOf(row), 1);
+            },
+            load: function () {
+                var main = this;
+                if (this.table_name != ""){
+                    var a = $.getJSON(this.table_name+'.json',
+                            function(res){
+                                //console.log(res.fields);
+                                main.fields = res.fields;
+                            }
+                    );
+                }
+            },
+            save: function () {
+                var fileName = this.table_name + ".json";
+                var data = {name: this.table_name, fields: this.fields};
+                var blob = new Blob([JSON.stringify(data)], {type: "json"});
+                //saveAs(blob, fileName);
+                const e = document.createEvent('MouseEvents');
+                var a = document.createElement('a');
+                a.download = fileName;
+                a.href = window.URL.createObjectURL(blob);
+                a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+                e.initEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                a.dispatchEvent(e);
+            }
+
+
+
+        },
+        mounted: function () {
+            var main = this;
+
+        }
+    })
+</script>
+<!--
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+-->
+
+
+</body>
+</html>

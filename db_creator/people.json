@@ -1,0 +1,69 @@
+{
+  "name": "people",
+  "fields": [
+    {
+      "order": 1,
+      "name": "ID",
+      "type": "INTEGER",
+      "primary": true,
+      "autoincrement": false,
+      "default": ""
+    },
+    {
+      "order": 2,
+      "name": "NAME",
+      "type": "VARCHAR2(400)",
+      "primary": false,
+      "autoincrement": false,
+      "default": ""
+    },
+    {
+      "order": 3,
+      "name": "EMAIL",
+      "type": "VARCHAR2(200)",
+      "primary": false,
+      "autoincrement": false,
+      "default": ""
+    },
+    {
+      "order": 4,
+      "name": "COUNTRY",
+      "type": "VARCHAR2(80)",
+      "primary": false,
+      "autoincrement": false,
+      "default": ""
+    },
+    {
+      "order": 5,
+      "name": "COMPANY",
+      "type": "VARCHAR2(200)",
+      "primary": false,
+      "autoincrement": false,
+      "default": ""
+    },
+    {
+      "order": 6,
+      "name": "PHONE",
+      "type": "VARCHAR2(80)",
+      "primary": false,
+      "autoincrement": false,
+      "default": ""
+    },
+    {
+      "order": 7,
+      "name": "CITY",
+      "type": "VARCHAR2(80)",
+      "primary": false,
+      "autoincrement": false,
+      "default": ""
+    },
+    {
+      "order": 8,
+      "name": "USER_GROUP",
+      "type": "VARCHAR2(20)",
+      "primary": false,
+      "autoincrement": false,
+      "default": ""
+    }
+  ]
+}
