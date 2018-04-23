@@ -6,7 +6,7 @@
       "name": "ID",
       "type": "INTEGER",
       "primary": true,
-      "autoincrement": false,
+      "autoincrement": true,
       "default": ""
     },
     {

@@ -16,6 +16,7 @@ class Layer(object):
         self.right = None
         self.bottom = None
         self.left = None
+        self.result_image = None
         # self.__image_place = ''
 
     @staticmethod
