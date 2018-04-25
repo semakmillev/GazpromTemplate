@@ -1,0 +1,22 @@
+{
+  "name": "session",
+  "fields": [
+    {
+      "order": 1,
+      "name": "ID",
+      "type": "VARCHAR2(50)",
+      "primary": true,
+      "autoincrement": false,
+      "default": ""
+    },
+    {
+      "order": 2,
+      "name": "USER_ID",
+      "type": "INTEGER",
+      "primary": false,
+      "autoincrement": false,
+      "default": ""
+    }
+
+  ]
+}

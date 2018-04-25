@@ -15,12 +15,38 @@ def create_script(table_name, fields):
         row += "," if len(fields) != i else ""
         row += "\n"
         script += row
-    script += script + ")"
+    script +=  ")"
     return script
 
 
-def create(fields):
+def create_py(table_name, fields):
+    field_row = ','.join(field['name'] for field in fields)
+    field_template_row = ','.join('?' for field in fields)
+    code = "def insert_table_%s(%s):\n" % (str(table_name).lower(), field_row.lower())
+    code += "\tconnection = create()\n"
+    code += "\tc = connection.cursor()\n"
+    code += "\tc.execute('insert into %s (%s) values (%s)', (%s))\n" % (
+        table_name, field_row, field_template_row, field_row.lower())
+    code += "\tlast_id = c.lastrowid\n"
+    code += "\tc.close()\n"
+    code += "\tconnection.close()\n"
+    code += "\treturn last_id\n"
+    code += "\n\n"
+    code += "def update_table_%s(id, **kwargs):\n" % (str(table_name).lower())
+    code += "\tconnection = create()\n"
+    code += "\tc = connection.cursor()\n"
+    code += "\tsql = ''\n"
+    code += "\tsql += 'update %s set'\n " % table_name
+    code += "\tsql += (',').join(k + ' = ?' for k,v in kwargs.iteritems())\n"
+    code += "\tsql +='\\"+"twhere id = ?'\n"
+    code += "\tparams = list(v for k,v in kwargs.iteritems()).append(id)\n"
+    code += "\tc.execute(sql,params)\n"
+    code += "\tc.close()\n"
+    code += "\tconnection.close()\n"
+    return code
 
+
+def create(fields):
     try:
         already_exists = os.path.exists("template.db")
         conn = sqlite3.connect("template.db")
@@ -34,7 +60,7 @@ def create(fields):
                                   email varchar2(200),
                                   user_name varchar2(200),
                                   company varchar2(200),
-                                  default_lang varchar2(200) default 'RUS',
+                                  default_lang varchar2(200) DEFAULT 'RUS',
                                   event_source varchar2(200),
 
                                   ''')
@@ -55,5 +81,5 @@ def create(fields):
         c.close()
         return conn
     except Exception as ex:
-        print '%s'%ex
+        print '%s' % ex
         raise

@@ -102,6 +102,10 @@ def upload(template_name):
     # f.save(file)
     return "1"
 
+@app.route('/login/')
+def login():
+    pass
+
 
 @app.after_request
 def after_request(response):

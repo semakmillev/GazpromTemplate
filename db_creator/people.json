@@ -26,6 +26,14 @@
       "default": ""
     },
     {
+      "order": 3,
+      "name": "PASSWORD",
+      "type": "VARCHAR2(200)",
+      "primary": false,
+      "autoincrement": false,
+      "default": ""
+    },
+    {
       "order": 4,
       "name": "COUNTRY",
       "type": "VARCHAR2(80)",
