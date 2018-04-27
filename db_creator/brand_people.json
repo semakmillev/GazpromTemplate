@@ -1,0 +1,29 @@
+{
+  "name": "brand_people",
+  "fields": [
+    {
+      "order": 1,
+      "name": "USER_ID",
+      "type": "INTEGER",
+      "primary": false,
+      "autoincrement": false,
+      "default": ""
+    },
+    {
+      "order": 2,
+      "name": "BRAND_ID",
+      "type": "INTEGER",
+      "primary": false,
+      "autoincrement": false,
+      "default": ""
+    },
+    {
+      "order": 3,
+      "name": "ROLE",
+      "type": "VARCHAR2(50)",
+      "primary": false,
+      "autoincrement": false,
+      "default": ""
+    }
+  ]
+}
