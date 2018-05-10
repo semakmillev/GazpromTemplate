@@ -123,12 +123,11 @@ def generate_template(template_name):
 
 @app.route('/server/upload/<template_name>', methods=['POST'])
 def upload(template_name):
-    print "!"
     if 'file' not in request.files:
         print "!!!"
     file = request.files['file']
     filename = secure_filename(file.filename)
-    file.save(os.path.abspath(os.path.dirname(__file__)) + "/templates/" + template_name + "/" + filename)
+    file.save(os.path.abspath(os.path.dirname(__file__)) + "/templates/" + template_name + "/files/" + filename)
 
     # f.save(file)
     return "1"

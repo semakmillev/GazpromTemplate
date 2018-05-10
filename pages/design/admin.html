@@ -123,7 +123,6 @@
     </div>
     <div id="templateInfoModal" class="modal fade" role="dialog">
         <div class="modal-dialog modal-lg">
-
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
@@ -131,27 +130,69 @@
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body" id="inputTemplateCode">
-                    <div class="input-group mb-3">
-                        <textarea class="form-control" placeholder="Введите код шаблона" rows="25"
-                                  style="overflow-y: scroll;" v-model="template_code"></textarea>
-                    </div>
-                    <hr>
-                    <!--------------------------->
-                    <ul class="list-group" style="padding-left: 0px">
-
-                        <li v-for="file in template_files" class="list-group-item">
-                            <div class="row">
-                                <div class="col-lg-10">{{ file.name }}</div>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-9">
+                                <div class="input-group mb-3">
+                                    <textarea class="form-control" placeholder="Введите код шаблона" rows="15"
+                                              style="overflow-y: scroll;" v-model="template_code"></textarea>
+                                </div>
                             </div>
+                            <div class="col-lg-3">
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#templateScriptPanel" role="tab">Скрипт шаблона</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#templateFilesPanel" role="tab">Файлы</a>
                         </li>
                     </ul>
-                    <label class="btn btn-secondary btn-files mb-0">
-                        <div class="col-lg-11">Browse</div>
-                        <div class="col-lg-1">
-                            <input type="file" style="display: none;" @change="onFileChange" multiple>
+
+                    <div class="tab-content">
+                        <div class="tab-pane" id="templateScriptPanel" role="tabpanel">
+                            <br>
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="input-group mb-3">
+                                    <textarea class="form-control" placeholder="Введите код шаблона" rows="10"
+                                        style="overflow-y: scroll;" v-model="template_code">{{ template_code }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </label>
-                    <button type="button" class="btn btn-danger" v-on:click="upload()">Загрузить!</button>
+                        <div class="tab-pane" id="templateFilesPanel" role="tabpanel">
+                            <br>
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <ul class="list-group" style="padding-left: 0px">
+
+                                        <li v-for="file in template_files" class="list-group-item">
+                                            <div class="row">
+                                                <div class="col-lg-10">{{ file.name }}</div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    <label class="btn btn-secondary btn-files mb-0">
+                                        <div class="col-lg-11">Browse</div>
+                                        <div class="col-lg-1">
+                                            <input type="file" style="display: none;" @change="onFileChange" multiple>
+                                        </div>
+                                    </label>
+                                    <button type="button" class="btn btn-danger" v-on:click="upload()">Загрузить!
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    ----->
+
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" v-on:click="saveTemplate()">Save</button>
@@ -256,7 +297,7 @@
             selectedTemplate: "",
             newBrandName: "",
             newTemplateName: "",
-            template_code: "",
+            template_code: "\n\n",
             template_files: []
         },
         methods: {
@@ -270,7 +311,9 @@
 
             },
             brandInfo: function (brand) {
-                this.brandTemplates = this.templates.filter(template => (template["BRAND_ID"] == brand.ID));
+                this.brandTemplates = this.templates.filter(template => (template["BRAND_ID"] == brand.ID)
+                )
+                ;
                 console.log(this.brandTemplates);
                 this.selectedBrand = brand;
                 $("#brandInfoModal").modal('show');
@@ -281,15 +324,19 @@
                 var session_id = localStorage.getItem("session_id");
                 var main = this;
                 main.selectedTemplate = template;
-                $.ajax({
-                    type: "GET",
-                    url: "../../server/templatecode/" + session_id,
-                    data: {"template_id": main.selectedTemplate.ID}
-                }).done(function (dt) {
-                    main.template_code = dt;
-                    console.log(dt);
-                    $('#templateInfoModal').modal('show');
-                });
+                var promise = new Promise(function (resolve, reject) {
+                    $.ajax({
+                        type: "GET",
+                        url: "../../server/templatecode/" + session_id,
+                        data: {"template_id": main.selectedTemplate.ID}
+                    }).done(function (dt) {
+                        resolve(dt);
+                    });
+                })
+                    .then(function (res) {
+                        main.template_code = res;
+                        $('#templateInfoModal').modal();
+                    });
 
 
             },
@@ -310,7 +357,9 @@
                     }).done(function (dt) {
                         console.log(dt);
                         main.templates = dt['templates'];
-                        main.brandTemplates = main.templates.filter(template => (template["BRAND_ID"] == main.selectedBrand.ID));
+                        main.brandTemplates = main.templates.filter(template => (template["BRAND_ID"] == main.selectedBrand.ID)
+                        )
+                        ;
                     });
                 });
             },

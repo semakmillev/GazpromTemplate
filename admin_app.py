@@ -30,6 +30,24 @@ def get_admin_brands(session_id, role):
     return jsonify(res)
 
 
+@app.route("/template/filelist/<session_id>", methods=['GET'])
+def get_file_list(session_id):
+    user_id = session.get_user_id(session_id)
+    template_id = request.args.get("template_id")
+    if template_id == None:
+        return 500
+    user_templates = people.get_user_items("select * from (" + consts.SQL_GET_USER_TEMPLATES + ") where ID = :template_id", user_id, None,
+                                           template_id=template_id)
+    if len(user_templates) == 0:
+        return "Access denied", 500
+    user_template = user_templates[0]
+    path = os.path.abspath(os.path.dirname(__file__)) + "/templates/" + user_template["PATH"] + "files/"
+    print path
+    files = [f for f in os.listdir(path) if os.path.isfile(path+f)]
+    res = {}
+    res["files"] = files
+    return jsonify(res)
+
 @app.route("/template/<session_id>/<role>", methods=['GET'])
 def get_admin_templates(session_id, role):
     user_id = session.get_user_id(session_id)

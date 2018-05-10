@@ -6,6 +6,7 @@ onlyfiles = [f for f in os.listdir(d) if os.path.isfile(os.path.join(d, f))]
 print onlyfiles
 '''
 import json
+import os
 import uuid
 
 import sqlite3
@@ -14,13 +15,10 @@ from dblite.consts import SQL_GET_USER_COMPANIES
 
 
 
-def test(**kwargs):
-    a = {}
-    a["tst"] = "123"
-    a.update(kwargs)
-    return a
-print test(x=1)
 
+path = '/media/semak/DATA/Development/GazpromTemplate/templates/first/'
+files = [f for f in os.listdir(path)if os.path.isfile(path+f)]
+print files
 '''
 f = file("db_creator/rules.json")
 
