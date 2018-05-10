@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+
 import main
 from flask import Flask, request, Response, jsonify, send_file
 from werkzeug.utils import secure_filename
@@ -10,6 +11,7 @@ import os
 # prefix = d['SERVER-INFO']['PREFIX']
 from dblite import people
 from dblite import session
+from dblite.consts import SQL_GET_USER_TEMPLATES
 from model import parse_template_request
 
 UPLOAD_FOLDER = os.path.abspath(os.path.dirname(__file__)) + '/templates'
@@ -72,9 +74,28 @@ def get_template_list(session_id):
     return jsonify(res)
 
 
+'''
 @app.route('/server/templatecode/<template_name>', methods=['GET'])
 def get_template_code(template_name):
     file = open(os.path.abspath(os.path.dirname(__file__)) + '/templates/%s/template.py' % template_name)
+    # res = [{"name": o} for o in os.listdir(d) if os.path.isdir(os.path.join(d, o))]
+    return file.read()
+'''
+
+
+@app.route('/server/templatecode/<session_id>', methods=['GET'])
+def get_template_code(session_id):
+    user_id = session.get_user_id(session_id)
+    template_id = request.args.get("template_id")
+    if template_id == None:
+        return 500
+    user_templates = people.get_user_items("select * from (" + SQL_GET_USER_TEMPLATES + ") where ID = :template_id", user_id, None,
+                                           template_id=template_id)
+    if len(user_templates) == 0:
+        return "Access denied", 500
+    template = user_templates[0]
+    file_path = os.path.abspath(os.path.dirname(__file__)) + '/templates/%s/template.py' % template["PATH"]
+    file = open(file_path)
     # res = [{"name": o} for o in os.listdir(d) if os.path.isdir(os.path.join(d, o))]
     return file.read()
 
@@ -127,7 +148,6 @@ def login():
         return jsonify(resp)
 
 
-
 @app.route('/register', methods=['POST'])
 def register():
     params = json.loads(request.data)
@@ -155,13 +175,10 @@ def verify():
             resp = {}
             resp["result"] = "OK"
             # del verificationCodes[email]
-            print "!"
             return jsonify(resp), 200
         else:
-            print "!!!"
             return "Wrong code", 500
     except KeyError:
-        print "!!!!"
         return "Wrong session", 500
 
 
@@ -176,8 +193,3 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     return response
-
-
-if __name__ == '__main__':
-    ## host='0.0.0.0'
-    app.run(host='0.0.0.0', port=5005)

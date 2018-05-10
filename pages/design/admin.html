@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <script src="vue.js"></script>
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap/css/glyphicons.css">
     <script src="bootstrap/js/jquery-3.3.1.min.js"></script>
     <script src="bootstrap/js/bootstrap.min.js"></script>
 
@@ -16,134 +17,220 @@
     -->
 </head>
 <body>
+
 <div id="app">
 
-    <br>
-    <div class="container-fluid">
-        <!--
-       <div class="row">
 
-           <div class="col-lg-1 mr-0 pr-1">
-               <div class="input-group mb-3">
-                   <input type="number" class="form-control" placeholder="Ширина" v-model="template_width">
-               </div>
-           </div>
-           <div class="col-lg-1 ml-0 mr-0 pl-0 pr-1">
-               <div class="input-group mb-3">
-                   <input type="number" class="form-control" placeholder="Высота" v-model="template_height">
-               </div>
-           </div>
-           <div class="col-lg-1 ml-0 mr-0 pl-0 pr-1">
-               <div class="input-group mb-3">
-                   <input type="number" class="form-control" placeholder="DPI" v-model="dpi">
-               </div>
-           </div>
-           <div class="col-lg-2 ml-0 mr-0 pl-0 pr-0 pr-1">
-               <div class="input-group mb-3">
-                   <input type="text" class="form-control" placeholder="Выбранный шаблон" id="template"
-                          v-model="selectedTemplate">
-               </div>
-           </div>
-           <div class="col-lg-1 ml-0 mr-0 pl-0 pr-1">
-               <select class="custom-select" v-model="format">
-                   <option value="JPEG" selected>JPEG</option>
-                   <option value="PDF">PDF</option>
-                   <option value="TIFF">TIFF</option>
-               </select>
-           </div>
-           <div class="col-lg-4 ml-0 mr-0 pl-0 pr-0">
+    <div class="modal fade" role="dialog" id="companyInfoModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1>{{selectedCompany.NAME}}</h1>
 
-               <button type="button" class="btn btn-primary" v-on:click="downloadTemplate()">Выгрузить</button>
-               <button type="button" class="btn btn-danger" v-on:click="editCode()">Редактировать</button>
-           </div>
-       </div>
-
-       -->
-
-
-        <h3>Мастер таблиц</h3>
-        <hr>
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-2">
-                    <input class="form-control" type="text" v-model="table_name">
                 </div>
-                <div class="col-lg-2">
-                    <button type="button" class="btn btn-primary" v-on:click="load()">Редактировать</button>
-                </div>
-                <div class="col-lg-2">
-                    <button type="button" class="btn btn-secondary" v-on:click="save()">Сохранить</button>
-                </div>
-            </div>
-            <br>
-            <div class="row">
-                <div class="col-lg-2">
-                    <button type="button" class="btn btn-primary" v-on:click="addRow()">Добавить</button>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <ul class="list-group" style="margin: 0px; padding-left: 0px">
+                            <div v-for="brand in companyBrands">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col-lg-8 mr-0 ml-0 pr-0 pl-0">
+                                            <span class="align-middle">{{ brand.NAME }}</span>
+
+                                        </div>
+                                        <div class="col-lg-2 mr-0 ml-0 pr-0 pl-0">
+                                            <button type="button" class="btn btn-primary" v-on:click="brandInfo(brand)">Редактировать</button>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <button type="button" class="btn btn-danger" v-on:click="deleteBrand(brand)">Удалить</button>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                </div>
+                            </div>
+                        </ul>
+
+                        <div class="row">
+                            <div class="col-lg-4 ml-0 mr-0 pl-0 pr-0 pr-1">
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control" placeholder="Новый брэнд"
+                                           v-model="newBrandName">
+                                </div>
+                            </div>
+                            <div class="col-lg-4 ml-0 mr-0 pl-0 pr-0">
+                                <button type="button" class="btn btn-primary" v-on:click="brandInfo('')">Добавить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <br>
-        <hr>
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-lg-3">
-                            <h6>Имя поля</h6>
-                        </div>
-                        <div class="col-lg-3">
-                            <h6>Тип данных</h6>
-                        </div>
-                        <div class="col-lg-2">
-                            <h6>Первичный ключ</h6>
-                        </div>
-                        <div class="col-lg-1">
-                            <h6>Инкримент</h6>
-                        </div>
-                        <div class="col-lg-3">
-                            <h6>Дефолт</h6>
-                        </div>
-                    </div>
-                    <hr>
+    </div>
+    <div class="modal fade" role="dialog" id="brandInfoModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1>{{selectedBrand.NAME}}</h1>
+
                 </div>
-                <ul id="v-for-object" class="list-goup" style="margin: 0px; padding-left: 0px">
-                    <div v-for="field in fields">
-                        <div class="container-fluid">
-                            <div class="row">
-                                <div class="col-lg-3">
-                                    <input class="form-control" type="text" v-model="field.name">
-                                </div>
-                                <div class="col-lg-3">
-                                    <input class="form-control" type="text" v-model="field.type">
-                                </div>
-                                <div class="col-lg-2">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" v-model="field.primary" id="primary1">
-                                        <label class="custom-control-label" for="primary1">Primary</label>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <ul class="list-group" style="margin: 0px; padding-left: 0px">
+                            <div v-for="template in brandTemplates">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col-lg-8 mr-0 ml-0 pr-0 pl-0">
+                                            <span class="align-middle">{{ template.NAME }}</span>
+
+                                        </div>
+                                        <div class="col-lg-2 mr-0 ml-0 pr-0 pl-0">
+                                            <button type="button" class="btn btn-primary" v-on:click="editTemplate(template)">Редактировать</button>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <button type="button" class="btn btn-danger" v-on:click="deleteTemplate(template)">Удалить</button>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-1">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" v-model="field.autoincrement" id="autoincrement1">
-                                        <label class="custom-control-label" for="autoincrement1">Autoinc</label>
-                                    </div>
-                                </div>
-                                <div class="col-lg-2">
-                                    <input class="form-control" type="text" v-model="field.default">
-                                </div>
-                                <div class="col-lg-1">
-                                    <button type="button" class="btn btn-primary" v-on:click="deleteRow(field)">Удалить
-                                    </button>
+                                    <hr>
                                 </div>
                             </div>
-                            <hr>
+                        </ul>
+
+                        <div class="row">
+                            <div class="col-lg-4 ml-0 mr-0 pl-0 pr-0 pr-1">
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control" placeholder="Новый шаблон"
+                                           v-model="newTemplateName">
+                                </div>
+                            </div>
+                            <div class="col-lg-4 ml-0 mr-0 pl-0 pr-0">
+                                <button type="button" class="btn btn-primary" v-on:click="editTemplate('')">Добавить
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="templateInfoModal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">{{selectedTemplate.NAME}}</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body" id="inputTemplateCode">
+                    <div class="input-group mb-3">
+                        <textarea class="form-control" placeholder="Введите код шаблона" rows="25"
+                                  style="overflow-y: scroll;" v-model="template_code"></textarea>
+                    </div>
+                    <hr>
+                    <!--------------------------->
+                    <ul class="list-group" style="padding-left: 0px">
+
+                        <li v-for="file in files" class="list-group-item">
+                            <div class="row">
+                                <div class="col-lg-10">{{ file.name }}</div>
+                            </div>
+                        </li>
+                    </ul>
+                    <label class="btn btn-secondary btn-files mb-0">
+                        <div class="col-lg-11">Browse</div>
+                        <div class="col-lg-1">
+                            <input type="file" style="display: none;" @change="onFileChange" multiple>
+                        </div>
+                    </label>
+                    <button type="button" class="btn btn-danger" v-on:click="upload()">Загрузить!</button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" v-on:click="saveTemplate()">Save</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <form class="form-inline my-2 my-lg-0">
+                <button type="button" class="btn btn-default" v-on:click="logout()">
+                    <span class="glyphicon glyphicon-log-out"></span> Log out
+                </button>
+            </form>
+        </div>
+    </nav>
+    <br>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#companyPanel" role="tab">Компании</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#brandPanel" role="tab">Брэнды</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#templatePanel" role="tab">Шаблоны</a>
+        </li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div class="tab-pane active" id="companyPanel" role="tabpanel">
+            <br>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <ul class="list-group m-0" style="padding-left: 0px;">
+                            <li v-for="company in companies" class="list-group-item"
+                                v-on:click="companyInfo(company)" :key="company.ID">
+                                <div>{{ company.NAME }}</div>
+
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane" id="brandPanel" role="tabpanel">
+            <br>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <ul class="list-group m-0" style="padding-left: 0px;">
+                            <li v-for="brand in brands" class="list-group-item" v-on:click="brandInfo(brand.id)"
+                                :key="brand.ID">
+                                <div>{{ brand.NAME }}</div>
+
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane" id="templatePanel" role="tabpanel">
+            <br>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <ul class="list-group m-0" style="padding-left: 0px;">
+                            <li v-for="template in templates" class="list-group-item"
+                                v-on:click="brandInfo(template.ID)" :key="template.ID">
+                                <div>{{ template.NAME }}</div>
+
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+
 <script>
     String.prototype.replaceAll = function (target, replacement) {
         return this.split(target).join(replacement);
@@ -151,61 +238,151 @@
     var app = new Vue({
         el: '#app',
         data: {
-            table_name: "people",
-            fields: [
-            ] //[{id: 1, name: 'semak'}, {id: 2, name: 'ter'}],
-
+            companies: [],
+            brands: [],
+            templates: [],
+            companyBrands: [],
+            brandTemplates: [],
+            selectedCompany: "",
+            selectedBrand: "",
+            selectedTemplate: "",
+            newBrandName: "",
+            newTemplateName: ""
         },
         methods: {
-            addRow: function () {
-                var nextOrder = this.fields.length + 1;
-                this.fields.push({
-                    order: nextOrder,
-                    name: "",
-                    type: "",
-                    primary: false,
-                    autoincrement: false,
-                    default: ""
+            companyInfo: function (company) {
+                this.companyBrands = this.brands.filter(brand => (brand["COMPANY_ID"] == company.ID));
+                console.log(this.companyBrands);
+                this.selectedCompany = company;
+                $("#companyInfoModal").modal('show');
+
+            },
+            brandInfo: function (brand) {
+                this.brandTemplates = this.templates.filter(template => (template["BRAND_ID"] == brand.ID));
+                console.log(this.brandTemplates);
+                this.selectedBrand = brand;
+                $("#brandInfoModal").modal('show');
+
+            },
+            //  ------------------------------РАБОТАЕМ С ШАБЛОНОМ!!!
+            templateInfo: function (template) {
+                var main = this;
+                console.log(this.selectedTemplate);
+                $.ajax({
+                    type: "GET",
+                    url: "../../server/templatecode/" + this.selectedTemplate,
+                    data: []
+                }).done(function (dt) {
+                    main.template_code = dt;
+                    console.log(dt);
+                    $('#myModal').modal('show');
+                });
+
+
+            },
+            upload: function () {
+                var main = this;
+                //var arr = {1:1,2:2};
+                var chain = Promise.resolve();
+                var steps = -1;
+                //console.log(this.files)
+                new Promise(function (resolve) {
+                    for (var x = 0; x < main.files.length; x++) {
+                        //var files = main.files;
+                        chain = chain.then(function () {
+                            return new Promise(function (res) {
+                                steps++;
+                                var formData = new FormData();
+                                formData.append("file", main.files[steps])
+                                $.ajax({
+                                    type: "POST",
+                                    url: "../../server/upload/" + main.selectedTemplate,
+                                    //contentType: "text",
+                                    //dataType: "text",
+                                    data: formData,
+                                    processData: false,  // tell jQuery not to process the data
+                                    contentType: false  // tell jQuery not to set contentType
+                                }).done(function () {
+                                    res("SUCCESS");
+                                    if (steps == main.files.length - 1) {
+                                        resolve("SUCCESS")
+                                    }
+                                }).fail(function (err) {
+                                    console.error(err);
+                                    res("ERR");
+                                });
+
+                            })
+
+                        });
+                    }
+                }).then(function () {
+                    main.files = [];
                 });
             },
-            deleteRow: function (row) {
-                console.log(row);
-                this.fields.splice(this.fields.indexOf(row), 1);
-            },
-            load: function () {
-                var main = this;
-                if (this.table_name != ""){
-                    var a = $.getJSON(this.table_name+'.json',
-                            function(res){
-                                //console.log(res.fields);
-                                main.fields = res.fields;
-                            }
-                    );
-                }
-            },
-            save: function () {
-                var fileName = this.table_name + ".json";
-                var data = {name: this.table_name, fields: this.fields};
-                var blob = new Blob([JSON.stringify(data)], {type: "json"});
-                //saveAs(blob, fileName);
-                const e = document.createEvent('MouseEvents');
-                var a = document.createElement('a');
-                a.download = fileName;
-                a.href = window.URL.createObjectURL(blob);
-                a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
-                e.initEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-                a.dispatchEvent(e);
-            }
 
+            onFileChange: function (e) {
+                this.files = e.target.files || e.dataTransfer.files;
+                if (!this.files.length)
+                    return;
+                //this.createImage(files[0]);
+            }
+            ,
+            saveTemplate: function () {
+                var code = this.template_code;
+                console.log(code);
+                $.ajax({
+                    type: "POST",
+                    url: "../../server/templatecode/" + this.selectedTemplate,
+                    contentType: "text",
+                    dataType: "text",
+                    data: code
+                }).done(function (dt) {
+                    $('#myModal').modal('hide');
+                });
+
+
+            }
+            ,
 
 
         },
         mounted: function () {
             var main = this;
+            var session_id = localStorage.getItem("session_id");
+            console.log(session_id);
+            var main = this;
+            $.ajax({
+                type: "GET",
+                url: "../../company/" + session_id + "/admin",
+                data: []
+            }).done(function (dt) {
+                console.log(dt);
+                main.companies = dt['companies'];
+            });
+            $.ajax({
+                type: "GET",
+                url: "../../brand/" + session_id + "/admin",
+                data: []
+            }).done(function (dt) {
+                console.log(dt);
+                main.brands = dt['brands'];
+            });
+            $.ajax({
+                type: "GET",
+                url: "../../template/" + session_id + "/admin",
+                data: []
+            }).done(function (dt) {
+                console.log(dt);
+                main.templates = dt['templates'];
+            });
+
 
         }
     })
 </script>
+
+
 <!--
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"

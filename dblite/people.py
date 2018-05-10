@@ -73,3 +73,17 @@ def get_user_by_email(email):
     res = c.execute(sql, [email])
     rows = res.fetchall()
     return None if len(rows) == 0 else rows[0][0]
+
+
+def get_user_items(sql, user_id, role, **kwargs):
+    c = create()
+    cur = c.cursor()
+    user_role = None if role == None else role.upper()
+    params = {'user_id': user_id, 'user_role': user_role}
+    params.update(kwargs)
+    cur.execute(sql, params)
+    rows = cur.fetchall()
+
+    cur.close()
+    c.close()
+    return [dict(row) for row in rows]

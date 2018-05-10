@@ -6,7 +6,7 @@ CREATE_SCRIPT = '''CREATE TABLE company(
                     NAME VARCHAR2(400))'''
 
 
-def insert_table_company(id,name):
+def insert_table_company(id, name):
     connection = create()
     c = connection.cursor()
     c.execute('insert into company (ID,NAME) values (?,?)', (id,name))
@@ -23,7 +23,8 @@ def update_table_company(id, **kwargs):
     sql += 'update company set'
     sql += (',').join(k + ' = ?' for k,v in kwargs.iteritems())
     sql +='\twhere id = ?'
-    params = list(v for k,v in kwargs.iteritems()).append(id)
+    params = list(v for k,v in kwargs.iteritems())
+    params.append(id)
     c.execute(sql,params)
     c.close()
     connection.close()

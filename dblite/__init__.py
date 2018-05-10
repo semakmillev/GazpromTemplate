@@ -6,6 +6,7 @@ def create():
     try:
         already_exists = os.path.exists("template.db")
         conn = sqlite3.connect("template.db")
+        conn.row_factory = sqlite3.Row
         if already_exists:
             return conn
 
