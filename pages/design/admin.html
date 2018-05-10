@@ -39,10 +39,14 @@
 
                                         </div>
                                         <div class="col-lg-2 mr-0 ml-0 pr-0 pl-0">
-                                            <button type="button" class="btn btn-primary" v-on:click="brandInfo(brand)">Редактировать</button>
+                                            <button type="button" class="btn btn-primary" v-on:click="brandInfo(brand)">
+                                                Редактировать
+                                            </button>
                                         </div>
                                         <div class="col-lg-2">
-                                            <button type="button" class="btn btn-danger" v-on:click="deleteBrand(brand)">Удалить</button>
+                                            <button type="button" class="btn btn-danger"
+                                                    v-on:click="deleteBrand(brand)">Удалить
+                                            </button>
                                         </div>
                                     </div>
                                     <hr>
@@ -85,10 +89,14 @@
 
                                         </div>
                                         <div class="col-lg-2 mr-0 ml-0 pr-0 pl-0">
-                                            <button type="button" class="btn btn-primary" v-on:click="editTemplate(template)">Редактировать</button>
+                                            <button type="button" class="btn btn-primary"
+                                                    v-on:click="templateInfo(template)">Редактировать
+                                            </button>
                                         </div>
                                         <div class="col-lg-2">
-                                            <button type="button" class="btn btn-danger" v-on:click="deleteTemplate(template)">Удалить</button>
+                                            <button type="button" class="btn btn-danger"
+                                                    v-on:click="deleteTemplate(template)">Удалить
+                                            </button>
                                         </div>
                                     </div>
                                     <hr>
@@ -104,7 +112,7 @@
                                 </div>
                             </div>
                             <div class="col-lg-4 ml-0 mr-0 pl-0 pr-0">
-                                <button type="button" class="btn btn-primary" v-on:click="editTemplate('')">Добавить
+                                <button type="button" class="btn btn-primary" v-on:click="addTemplate()">Добавить
                                 </button>
                             </div>
                         </div>
@@ -131,7 +139,7 @@
                     <!--------------------------->
                     <ul class="list-group" style="padding-left: 0px">
 
-                        <li v-for="file in files" class="list-group-item">
+                        <li v-for="file in template_files" class="list-group-item">
                             <div class="row">
                                 <div class="col-lg-10">{{ file.name }}</div>
                             </div>
@@ -247,11 +255,15 @@
             selectedBrand: "",
             selectedTemplate: "",
             newBrandName: "",
-            newTemplateName: ""
+            newTemplateName: "",
+            template_code: "",
+            template_files: []
         },
         methods: {
             companyInfo: function (company) {
-                this.companyBrands = this.brands.filter(brand => (brand["COMPANY_ID"] == company.ID));
+                this.companyBrands = this.brands.filter(brand => (brand["COMPANY_ID"] == company.ID)
+                )
+                ;
                 console.log(this.companyBrands);
                 this.selectedCompany = company;
                 $("#companyInfoModal").modal('show');
@@ -266,19 +278,41 @@
             },
             //  ------------------------------РАБОТАЕМ С ШАБЛОНОМ!!!
             templateInfo: function (template) {
+                var session_id = localStorage.getItem("session_id");
                 var main = this;
-                console.log(this.selectedTemplate);
+                main.selectedTemplate = template;
                 $.ajax({
                     type: "GET",
-                    url: "../../server/templatecode/" + this.selectedTemplate,
-                    data: []
+                    url: "../../server/templatecode/" + session_id,
+                    data: {"template_id": main.selectedTemplate.ID}
                 }).done(function (dt) {
                     main.template_code = dt;
                     console.log(dt);
-                    $('#myModal').modal('show');
+                    $('#templateInfoModal').modal('show');
                 });
 
 
+            },
+            addTemplate: function (template) {
+                var session_id = localStorage.getItem("session_id");
+                var main = this;
+                var template_name = main.newTemplateName;
+                $.ajax({
+                    type: "POST",
+                    url: "../../template/add/" + session_id + "?brand_id=" + main.selectedBrand.ID,
+                    contentType: "application/json",
+                    data: JSON.stringify({"template_name": template_name})
+                }).done(function (dt) {
+                    $.ajax({
+                        type: "GET",
+                        url: "../../template/" + session_id + "/admin",
+                        data: []
+                    }).done(function (dt) {
+                        console.log(dt);
+                        main.templates = dt['templates'];
+                        main.brandTemplates = main.templates.filter(template => (template["BRAND_ID"] == main.selectedBrand.ID));
+                    });
+                });
             },
             upload: function () {
                 var main = this;
@@ -287,13 +321,13 @@
                 var steps = -1;
                 //console.log(this.files)
                 new Promise(function (resolve) {
-                    for (var x = 0; x < main.files.length; x++) {
+                    for (var x = 0; x < main.template_files.length; x++) {
                         //var files = main.files;
                         chain = chain.then(function () {
                             return new Promise(function (res) {
                                 steps++;
                                 var formData = new FormData();
-                                formData.append("file", main.files[steps])
+                                formData.append("file", main.template_files[steps])
                                 $.ajax({
                                     type: "POST",
                                     url: "../../server/upload/" + main.selectedTemplate,
@@ -304,7 +338,7 @@
                                     contentType: false  // tell jQuery not to set contentType
                                 }).done(function () {
                                     res("SUCCESS");
-                                    if (steps == main.files.length - 1) {
+                                    if (steps == main.template_files.length - 1) {
                                         resolve("SUCCESS")
                                     }
                                 }).fail(function (err) {
@@ -317,13 +351,13 @@
                         });
                     }
                 }).then(function () {
-                    main.files = [];
+                    main.template_files = [];
                 });
             },
 
             onFileChange: function (e) {
-                this.files = e.target.files || e.dataTransfer.files;
-                if (!this.files.length)
+                this.template_files = e.target.files || e.dataTransfer.files;
+                if (!this.template_files.length)
                     return;
                 //this.createImage(files[0]);
             }

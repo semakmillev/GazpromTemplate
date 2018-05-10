@@ -10,3 +10,4 @@ temp/
 exiftool.exe
 *.tiff
 *.pdf
+templates/company*

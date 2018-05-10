@@ -9,12 +9,13 @@ CREATE TABLE template(
 '''
 
 
-def insert_table_template(id, name, brand_id, path):
+def insert_table_template(name, brand_id, path):
     connection = create()
     c = connection.cursor()
-    c.execute('insert into template (ID,NAME,BRAND_ID,PATH) values (?,?,?,?)', (id, name, brand_id, path))
+    c.execute('insert into template (NAME,BRAND_ID,PATH) values (?,?,?)', (name, brand_id, path))
     last_id = c.lastrowid
     c.close()
+    connection.commit()
     connection.close()
     return last_id
 
@@ -29,4 +30,5 @@ def update_table_template(id, **kwargs):
     params = list(v for k, v in kwargs.iteritems()).append(id)
     c.execute(sql, params)
     c.close()
+    connection.commit()
     connection.close()
