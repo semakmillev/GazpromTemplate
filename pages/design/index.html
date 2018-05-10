@@ -7,10 +7,18 @@
 
     <script src="bootstrap/js/jquery-3.3.1.min.js"></script>
 
-    <script src="bootstrap/js/bootstrap.min.js"></script>
-    <script src="crypto-js/md5.js"></script>
+
+    <script src="sha256.js"></script>
 
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap/css/glyphicons.css">
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <!--<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">-->
+    <!--
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
     <!--
     <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <script type="text/javascript" src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
@@ -32,8 +40,17 @@
     }
 </style>
 <div id="app">
-
-    <br>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+            </ul>
+            <form class="form-inline my-2 my-lg-0">
+                <button type="button" class="btn btn-default" v-on:click="logout()">
+                    <span class="glyphicon glyphicon-log-out"></span> Log out
+                </button>
+            </form>
+        </div>
+    </nav>
     <!--
     <div class="modal fade" role="dialog" id="loginModal">
         <div class="modal-dialog modal-lg">
@@ -61,10 +78,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-1 mr-0 pr-1">
-                <button type="button" class="btn btn-primary" v-on:click="openLogin()">Логин</button>
-            </div>
-            <div class="col-lg-10 mr-0 pr-1">
-
+                <!-- <button type="button" class="btn btn-primary" v-on:click="openLogin()">Логин</button>-->
 
             </div>
         </div>
@@ -88,6 +102,9 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#registerPanel" role="tab">Register</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#verifyPanel" role="tab">Verify</a>
                         </li>
                     </ul>
 
@@ -119,7 +136,7 @@
                                     <div class="input-group mb-1 mt-1">
                                         <input type="email" class="form-control" placeholder="Email"
                                                id="registerEmail"
-                                               v-model="loginEmail">
+                                               v-model="registerEmail">
                                     </div>
                                 </div>
                                 <div class="row">
@@ -143,11 +160,65 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="tab-pane" id="verifyPanel" role="tabpanel">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="input-group mb-1 mt-1">
+                                        <input type="email" class="form-control" placeholder="Email"
+                                               id="verifyEmail"
+                                               v-model="verifyEmail">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-group mb-1">
+                                        <input type="password" class="form-control" placeholder="Verfication code"
+                                               id="verificationCode"
+                                               v-model="verificationCode">
+                                    </div>
+                                </div>
+                                <div class="row mb-1">
+                                    <button type="button" class="btn btn-primary w-100"
+                                            v-on:click="verify()">
+                                        Проверить!
+                                    </button>
+                                </div>
+                                <div class="row">
+                                    <button type="button" class="btn btn-secondary w-100"
+                                            v-on:click="resendVerification()">
+                                        Переотправить код
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <!--
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary save">Save changes</button>
+                </div>
+                -->
+            </div>
+        </div>
+    </div>
+    <!------->
+    <div class="modal fade" id="verification" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="input-group mb-1 mt-1">
+                                <input type="number" class="form-control"
+                                       id="verifyCode"
+                                       v-model="verifyCode">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <button type="button" class="btn btn-primary w-100" v-on:click="verify()">Проверить!
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -238,7 +309,7 @@
         <div class="row">
             <div class="col-lg-12">
                 <ul id="v-for-object" class="list-goup" style="margin: 0px; padding-left: 0px">
-                    <li v-for="item in items" class="list-group-item" v-on:click="click(item.name)">
+                    <li v-for="item in items" class="list-group-item" v-on:click="click(item.id)" :key="item.id">
                         <div>{{ item.name }}</div>
 
                     </li>
@@ -251,6 +322,7 @@
     String.prototype.replaceAll = function (target, replacement) {
         return this.split(target).join(replacement);
     };
+
     var main = this;
     var app = new Vue({
         el: '#app',
@@ -266,6 +338,9 @@
             template_width: 1000,
             template_code: "",
             format: "JPEG",
+            verifyCode: "",
+            verifyEmail: "",
+            verificationCode: "",
             dpi: 96,
             files: {}
         },
@@ -302,7 +377,8 @@
                                     if (steps == main.files.length - 1) {
                                         resolve("SUCCESS")
                                     }
-                                }).fail(function () {
+                                }).fail(function (err) {
+                                    console.error(err);
                                     res("ERR");
                                 });
 
@@ -313,36 +389,9 @@
                 }).then(function () {
                     main.files = [];
                 });
-
-
-                ///  formData.append("file", this.files[x]);
-
-
-                //formData.append('file', this.files[0]);
-                //formData.append('file1[]', this.files);
-
-
-                /*
-                 for (var i = 0; i < this.files.length; i++) {
-                 var file = this.files[i];
-                 $.ajax({
-                 type: "POST",
-                 url: "../../server/upload/"+this.selectedTemplate,
-                 //contentType: "text",
-                 //dataType: "text",
-                 data: formData,
-                 processData: false,  // tell jQuery not to process the data
-                 contentType: false,  // tell jQuery not to set contentType
-                 });
-                 }
-                 //3console.log(formData);
-                 /*
-                 */
-
-
             },
-            onFileChange(e)
-            {
+
+            onFileChange: function (e) {
                 this.files = e.target.files || e.dataTransfer.files;
                 if (!this.files.length)
                     return;
@@ -379,13 +428,105 @@
                 });
 
 
-            }
-            ,
-            openLogin: function () {
-                $('#loginModal').modal('show');
             },
-            register: function(){
 
+            openLogin: function () {
+                $('#loginModal').modal({backdrop: 'static', keyboard: false}); //modal('show',{data-keyboard="false"});
+            },
+
+            gotoDB: function () {
+                this.$route.push("/admin.html");
+                //window.location.href = 'db.html';
+            },
+            login: function(){
+                var main = this;
+                var email = main.loginEmail;
+                var password = sha256.hex(main.loginPassword);
+                console.log(password);
+                var regPromise = new Promise(function (resolve, reject) {
+                    $.ajax({
+                        type: "POST",
+                        url: "../../login",
+                        //contentType: "text",
+                        //dataType: "text",
+                        data: JSON.stringify({
+                            "email": email,
+                            "password": password
+                        }),
+                        contentType: "application/json"
+                    }).done(function (res) {
+                        console.log(res);
+                        localStorage.setItem("session_id", res["session_id"]);
+                        location.reload();
+                    }).fail(function () {
+                        reject("ERR");
+                    });
+
+                });
+            },
+            register: function () {
+                var main = this;
+                if (this.registerPassword == this.repeatRegisterPassword) {
+                    var regPromise = new Promise(function (resolve, reject) {
+                        $.ajax({
+                            type: "POST",
+                            url: "../../register",
+                            //contentType: "text",
+                            //dataType: "text",
+                            data: JSON.stringify({
+                                "email": main.registerEmail,
+                                "password": sha256.hex(main.registerPassword)
+                            }),
+                            contentType: "application/json"
+                        }).done(function (res) {
+                            console.log(res);
+                            var result = res;
+                            if (result["verified"] == "0") {
+                                localStorage.setItem("session2verify", result["session_id"]);
+                                main.verifyEmail = main.registerEmail;
+                                $('[href="#verifyPanel"]').tab('show');
+
+                            }
+
+                        }).fail(function () {
+                            reject("ERR");
+                        });
+
+                    });
+                    /*
+                     var passhash = sha256.hex(this.registerPassword);
+                     $('[href="#verifyPanel"]').tab('show');
+                     /// this.openVerify();
+                     */
+
+                }
+
+            },
+            verify: function () {
+                var session_id = localStorage.getItem("session2verify");
+                console.log(localStorage.getItem("session2verify"));
+                var main = this;
+                var regPromise = new Promise(function (resolve, reject) {
+                    $.ajax({
+                        type: "POST",
+                        url: "../../verify",
+                        //contentType: "text",
+                        //dataType: "text",
+                        data: JSON.stringify({"email": main.verifyEmail, "code": main.verificationCode}),
+                        contentType: "application/json"
+                    }).done(function (res) {
+                        //console.log(res);
+                        if (res["result"] == "OK") {
+                            localStorage.setItem("session_id", session_id);
+                            // $('#loginModal').modal("toggle");
+                            location.reload();
+                        }
+                    }).fail(function (err) {
+                        console.log(err);
+                        reject("ERR");
+                    });
+
+                });
             },
             downloadTemplate: function () {
                 var main = this;
@@ -417,8 +558,8 @@
                         }
                         var type = http.getResponseHeader('Content-Type');
                         var blob = typeof File === 'function'
-                                ? new File([this.response], filename, {type: type})
-                                : new Blob([this.response], {type: type});
+                            ? new File([this.response], filename, {type: type})
+                            : new Blob([this.response], {type: type});
                         if (typeof window.navigator.msSaveBlob !== 'undefined') {
                             // IE workaround for "HTML7007: One or more blob URLs were revoked by closing the blob for which they were created. These URLs will no longer resolve as the data backing the URL has been freed."
                             window.navigator.msSaveBlob(blob, filename);
@@ -451,7 +592,7 @@
                 //http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
                 http.onreadystatechange = function () {
 
-                }
+                };
                 http.send(JSON.stringify(request_data));
 
                 /*
@@ -462,14 +603,24 @@
                  dataType: "json",
                  data: JSON.stringify(request_data)
                  });*/
+            },
+            logout: function () {
+                localStorage.setItem("session_id", null);
+                location.reload();
             }
-
         },
+
         mounted: function () {
+            console.log(localStorage.getItem("session_id"));
+            if (localStorage.getItem("session_id") == null || localStorage.getItem("session_id") == "null") {
+                this.openLogin();
+                return;
+            }
+            var session_id = localStorage.getItem("session_id");
             var main = this;
             $.ajax({
                 type: "GET",
-                url: "../../server/templatelist/",
+                url: "../../server/templatelist/" + session_id,
                 data: []
             }).done(function (dt) {
                 main.items = dt;

@@ -7,27 +7,31 @@ print onlyfiles
 '''
 import json
 import uuid
-
-f = file("db_creator/session.json")
+'''
+f = file("db_creator/rules.json")
 
 str = f.read()
 j = json.loads(str)
 
-from db_creator.template_db import *
 
-#print create_py(j['name'], j['fields'])
 
-#print create_script(j['name'], j['fields'])
-#print create_py(j['name'], j['fields'])
+from db_creator import template_db
 
-#a = uuid.uuid4()
+print template_db.create_script(j['name'], j['fields'])
+print template_db.create_py(j['name'], j['fields'])
+'''
 
-#print a
+from dblite import create
 
-from dblite.session import *
-
-a = get_user_id("123fddde")
-print a
+c = create()
+sql = "select * from template"
+connection = create()
+cursor = connection.cursor()
+cursor.execute(sql)
+rows = cursor.fetchall()
+for row in rows:
+    print(row[1])
+c.close()
 
 
 

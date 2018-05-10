@@ -1,0 +1,1 @@
+{"name":"brand","fields":[{"order":1,"name":"ID","type":"INTEGER","primary":true,"autoincrement":true,"default":""},{"order":2,"name":"NAME","type":"VARCHAR2(400)","primary":false,"autoincrement":false,"default":""},{"order":3,"name":"COMPANY_ID","type":"VARCHAR2(200)","primary":false,"autoincrement":false,"default":""}]}

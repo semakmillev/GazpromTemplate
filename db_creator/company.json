@@ -1,0 +1,1 @@
+{"name":"company","fields":[{"order":1,"name":"ID","type":"INTEGER","primary":true,"autoincrement":true,"default":""},{"order":2,"name":"NAME","type":"VARCHAR2(400)","primary":false,"autoincrement":false,"default":""}]}

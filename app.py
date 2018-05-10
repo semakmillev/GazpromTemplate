@@ -3,15 +3,19 @@ import json
 import main
 from flask import Flask, request, Response, jsonify, send_file
 from werkzeug.utils import secure_filename
+from dblite import *
 
 import os
 
 # prefix = d['SERVER-INFO']['PREFIX']
+from dblite import people
+from dblite import session
 from model import parse_template_request
 
 UPLOAD_FOLDER = os.path.abspath(os.path.dirname(__file__)) + '/templates'
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+verificationCodes = {}
 
 
 # ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif','png', 'ttf'])
@@ -55,10 +59,16 @@ def get_resource(path):  # pragma: no cover
     ), 200
 
 
-@app.route('/server/templatelist/', methods=['GET'])
-def get_template_list():
+@app.route('/server/templatelist/<session_id>', methods=['GET'])
+def get_template_list(session_id):
     d = os.path.abspath(os.path.dirname(__file__)) + '/templates'
-    res = [{"name": o} for o in os.listdir(d) if os.path.isdir(os.path.join(d, o))]
+    sql = "select * from template"
+    connection = create()
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    rows = cursor.fetchall()
+    res = [{"id": row[0], "name": row[1]} for row in rows]
+    # res = [{"NAME": o} for o in os.listdir(d) if os.path.isdir(os.path.join(d, o))]
     return jsonify(res)
 
 
@@ -102,8 +112,61 @@ def upload(template_name):
     # f.save(file)
     return "1"
 
-@app.route('/login/')
+
+@app.route('/login', methods=['POST'])
 def login():
+    params = json.loads(request.data)
+    resp = {}
+    email = params['email']
+    password = params['password']
+    session_id = people.login(email, password)
+    if session_id == None:
+        return "Wrong login", 500
+    else:
+        resp["session_id"] = session_id
+        return jsonify(resp)
+
+
+
+@app.route('/register', methods=['POST'])
+def register():
+    params = json.loads(request.data)
+    resp = {}
+    email = params['email']
+    session_id = people.register(email, params['password'])
+    resp["session_id"] = session_id
+    verificationCodes[email] = {}
+    verificationCodes[email]["code"] = "123123"
+    verificationCodes[email]["session_id"] = session_id
+    resp["verified"] = "0"
+    return jsonify(resp)
+
+
+@app.route('/verify', methods=['POST'])
+def verify():
+    params = json.loads(request.data)
+    resp = {}
+    email = params['email']
+    verification_code = params['code']
+    try:
+        if verification_code == "123123":
+            user_id = people.get_user_by_email(email)
+            people.update_table_people(user_id, VERIFIED=1)
+            resp = {}
+            resp["result"] = "OK"
+            # del verificationCodes[email]
+            print "!"
+            return jsonify(resp), 200
+        else:
+            print "!!!"
+            return "Wrong code", 500
+    except KeyError:
+        print "!!!!"
+        return "Wrong session", 500
+
+
+@app.route("/rules/<session_id>", methods=['GET'])
+def rules(session_id):
     pass
 
 
