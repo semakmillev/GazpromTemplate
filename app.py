@@ -121,16 +121,22 @@ def generate_template(template_name):
     return send_file(file_name)
 
 
-@app.route('/server/upload/<template_name>', methods=['POST'])
-def upload(template_name):
-    if 'file' not in request.files:
-        print "!!!"
+@app.route('/server/upload/<session_id>', methods=['POST'])
+def upload(session_id):
+    user_id = session.get_user_id(session_id)
+    template_id = request.args.get("template_id")
+    if template_id == None:
+        return "Empty template", 500
+    user_templates = people.get_user_items("select * from (" + SQL_GET_USER_TEMPLATES + ") where ID = :template_id", user_id, None,
+                                           template_id=template_id)
+    if len(user_templates) == 0:
+        return "Access denied", 500
+    user_template = user_templates[0]
+    # file_path = os.path.abspath(os.path.dirname(__file__)) + '/templates/%s/template.py' % user_template["PATH"]
     file = request.files['file']
     filename = secure_filename(file.filename)
-    file.save(os.path.abspath(os.path.dirname(__file__)) + "/templates/" + template_name + "/files/" + filename)
-
-    # f.save(file)
-    return "1"
+    file.save(os.path.abspath(os.path.dirname(__file__)) + "/templates/" + user_template["PATH"] + "/files/" + filename)
+    return "OK", 200
 
 
 @app.route('/login', methods=['POST'])

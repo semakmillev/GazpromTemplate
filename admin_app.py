@@ -36,17 +36,42 @@ def get_file_list(session_id):
     template_id = request.args.get("template_id")
     if template_id == None:
         return 500
-    user_templates = people.get_user_items("select * from (" + consts.SQL_GET_USER_TEMPLATES + ") where ID = :template_id", user_id, None,
-                                           template_id=template_id)
+    user_templates = people.get_user_items(
+        "select * from (" + consts.SQL_GET_USER_TEMPLATES + ") where ID = :template_id", user_id, None,
+        template_id=template_id)
     if len(user_templates) == 0:
         return "Access denied", 500
     user_template = user_templates[0]
-    path = os.path.abspath(os.path.dirname(__file__)) + "/templates/" + user_template["PATH"] + "files/"
+    path = os.path.abspath(os.path.dirname(__file__)) + "/templates/" + user_template["PATH"] + "/files/"
     print path
-    files = [f for f in os.listdir(path) if os.path.isfile(path+f)]
+    files = [f for f in os.listdir(path) if os.path.isfile(path + f)]
     res = {}
     res["files"] = files
     return jsonify(res)
+
+
+@app.route("/template/filelist/delete/<session_id>", methods=['POST'])
+def delete_file(session_id):
+    print "!"
+    print request.data
+    print "!!"
+    user_id = session.get_user_id(session_id)
+    template_id = request.args.get("template_id")
+    params = json.loads(request.data)
+    if template_id == None:
+        return 500
+    user_templates = people.get_user_items(
+        "select * from (" + consts.SQL_GET_USER_TEMPLATES + ") where ID = :template_id", user_id, None,
+        template_id=template_id)
+    if len(user_templates) == 0:
+        return "Access denied", 500
+    user_template = user_templates[0]
+    path = os.path.abspath(os.path.dirname(__file__)) + "/templates/" + user_template["PATH"] + "/files/"
+    os.remove(path + params['file_name'])
+    res = {}
+    res["files"] = [f for f in os.listdir(path) if os.path.isfile(path + f)]
+    return jsonify(res)
+
 
 @app.route("/template/<session_id>/<role>", methods=['GET'])
 def get_admin_templates(session_id, role):
