@@ -89,7 +89,8 @@ def get_template_code(session_id):
     template_id = request.args.get("template_id")
     if template_id == None:
         return 500
-    user_templates = people.get_user_items("select * from (" + SQL_GET_USER_TEMPLATES + ") where ID = :template_id", user_id, None,
+    user_templates = people.get_user_items("select * from (" + SQL_GET_USER_TEMPLATES + ") where ID = :template_id",
+                                           user_id, None,
                                            template_id=template_id)
     if len(user_templates) == 0:
         return "Access denied", 500
@@ -98,6 +99,15 @@ def get_template_code(session_id):
     file = open(file_path)
     # res = [{"name": o} for o in os.listdir(d) if os.path.isdir(os.path.join(d, o))]
     return file.read()
+
+
+@app.route('/server/invitation/<invitation_id>')
+def get_email_by_invitation(invitation_id):
+    conn = create()
+    cursor = conn.cursor()
+    res = cursor.execute("select * from invitation where SID = ?", [invitation_id])
+    rows = res.fetchall()
+    return "" if len(rows) == 0 else rows[0]['EMAIL']
 
 
 @app.route('/server/templatecode/<template_name>', methods=['POST'])
@@ -127,7 +137,8 @@ def upload(session_id):
     template_id = request.args.get("template_id")
     if template_id == None:
         return "Empty template", 500
-    user_templates = people.get_user_items("select * from (" + SQL_GET_USER_TEMPLATES + ") where ID = :template_id", user_id, None,
+    user_templates = people.get_user_items("select * from (" + SQL_GET_USER_TEMPLATES + ") where ID = :template_id",
+                                           user_id, None,
                                            template_id=template_id)
     if len(user_templates) == 0:
         return "Access denied", 500

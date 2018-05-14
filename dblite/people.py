@@ -35,7 +35,7 @@ def update_table_people(id, **kwargs):
     sql += 'update people set '
     sql += (',').join(k + ' = ?' for k, v in kwargs.iteritems())
     sql += '\twhere id = ?'
-    params =  list(v for k, v in kwargs.iteritems())
+    params = list(v for k, v in kwargs.iteritems())
     params.append(id)
     # params = list(v for k, v in kwargs.iteritems()).append(id)
     # print sql
@@ -47,7 +47,16 @@ def update_table_people(id, **kwargs):
 
 
 def register(email, password):
-    user_id = insert_table_people("", email, password, "", "", "", "", 0)
+    connection = create()
+    cur = connection.cursor()
+    rows = cur.execute("select * from people where EMAIL = ?", email)
+    if len(rows) == 0:
+        user_id = insert_table_people("", email, password, "", "", "", "", 0)
+    else:
+        if not rows[0]['PASSWORD'] is None or not rows[0]['PASSWORD'] == "":
+            raise ValueError('User already exists')
+        user_id = rows[0]["ID"]
+        update_table_people(user_id, password=password)
     session_id = create_session(user_id)
     return session_id
 
@@ -81,6 +90,7 @@ def get_user_items(sql, user_id, role, **kwargs):
     user_role = None if role == None else role.upper()
     params = {'user_id': user_id, 'user_role': user_role}
     params.update(kwargs)
+    # print sql, params
     cur.execute(sql, params)
     rows = cur.fetchall()
 

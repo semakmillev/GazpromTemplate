@@ -1,5 +1,5 @@
 SQL_GET_USER_COMPANIES = '''
-select c.ID, c.NAME
+select c.ID, c.NAME, c.ARCHIVED
   from company c,
        rules r
  where 1=1
@@ -9,7 +9,7 @@ select c.ID, c.NAME
 '''
 
 SQL_GET_USER_BRANDS = '''
-select b.ID, b.NAME, b.COMPANY_ID
+select b.ID, b.NAME, b.COMPANY_ID, b.ARCHIVED
   from company c,
        brand b,
        rules r
@@ -19,7 +19,7 @@ select b.ID, b.NAME, b.COMPANY_ID
    and r.ROLE = IFNULL(:user_role,r.ROLE)
    and b.COMPANY_ID = c.ID
 UNION ALL
-select b.ID, b.NAME, b.COMPANY_ID
+select b.ID, b.NAME, b.COMPANY_ID, b.ARCHIVED
   from brand b,
        rules r
  where 1=1

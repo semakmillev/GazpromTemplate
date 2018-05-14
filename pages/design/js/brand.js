@@ -2,19 +2,8 @@
  * Created by Golubitskiy_AO on 11.05.2018.
  */
 
-var templateModule ={
-    getTemplateFiles: function(template_id){
-        var session_id = localStorage.getItem("session_id");
-        return new Promise(function (resolve, reject) {
-            $.ajax({
-                type: "GET",
-                url: "../../template/filelist/" + session_id,
-                data: {"template_id": template_id}
-            }).done(function (dt) {
-                resolve(dt);
-            });
-        })
-    },
+var brandModule = {
+
     getTemplateCode: function (template_id) {
         var session_id = localStorage.getItem("session_id");
         return new Promise(function (resolve, reject) {
@@ -25,46 +14,48 @@ var templateModule ={
             }).done(function (dt) {
                 resolve(dt);
             });
-        })         
+        })
     },
-    deleteFile: function(template_id, fileName){
+    addBrand: function (companyId, brandName, archived) {
         var session_id = localStorage.getItem("session_id");
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: "POST",
-                url: "../../template/filelist/delete/" + session_id + "?template_id=" + template_id,
+                url: "../../brand/add/" + session_id + "?company_id=" + companyId+"&archived="+archived,
                 contentType: "application/json",
-                data: JSON.stringify({"file_name": fileName})
+                data: JSON.stringify({"brand_name": brandName})
             }).done(function (dt) {
                 resolve(dt);
             });
         });
     },
-    addTemplate: function (template_name, brand_id) {
+    deleteBrand: function (companyId, brandId, archived) {
         var session_id = localStorage.getItem("session_id");
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: "POST",
-                url: "../../template/add/" + session_id + "?brand_id=" + brand_id,
+                url: "../../brand/delete/" + session_id + "?company_id=" + companyId+"&archived="+archived,
                 contentType: "application/json",
-                data: JSON.stringify({"template_name": template_name})
+                data: JSON.stringify({"brand_id": brandId})
             }).done(function (dt) {
                 resolve(dt);
             });
         });
     },
-    deleteTemplate: function(template_id){
+    getListOfBrands: function (role, archived) {
         var session_id = localStorage.getItem("session_id");
-        return new Promise(function (resolve, reject) {
+        return new Promise(function (resolve) {
             $.ajax({
-                type: "POST",
-                url: "../../template/delete/" + session_id,
-                contentType: "application/json",
-                data: JSON.stringify({"template_id": template_id})
+                type: "GET",
+                url: "../../brand/" + session_id + "/" + role + "?archived=" + archived,
+                data: []
             }).done(function (dt) {
+                console.log(dt);
                 resolve(dt);
             });
         });
-    }
 
+
+    }
 }
+

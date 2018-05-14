@@ -32,3 +32,14 @@ def update_table_template(id, **kwargs):
     c.close()
     connection.commit()
     connection.close()
+
+
+def delete_template(id):
+    connection = create()
+    c = connection.cursor()
+    sql = ''
+    sql += 'delete from template where ID = ?'
+    c.execute(sql, [id])
+    c.close()
+    connection.commit()
+    connection.close()

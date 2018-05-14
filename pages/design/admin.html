@@ -29,6 +29,11 @@
                 </div>
                 <div class="modal-body">
                     <div class="container-fluid">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" v-model="showArchiveBrands" id="showArchivedModal">
+                            <label class="form-check-label" for="showArchivedModal">Показать архивные</label>
+                        </div>
+                        <hr>
                         <ul class="list-group" style="margin: 0px; padding-left: 0px">
                             <div v-for="brand in companyBrands">
                                 <div class="container-fluid">
@@ -62,7 +67,7 @@
                             </div>
                             <div class="col-lg-4 ml-0 mr-0 pl-0 pr-0">
                                 <button type="button" class="btn btn-primary" data-toggle="confirmation"
-                                        v-on:click="brandInfo('')">Добавить
+                                        v-on:click="addBrand('')">Добавить
                                 </button>
                             </div>
                         </div>
@@ -218,12 +223,6 @@
             </form>
         </div>
     </nav>
-    <div class="card mb-3">
-        <div class="card-header">Basic</div>
-        <div class="card-body">
-            <button class="btn btn-primary" v-on:click="test()">Confirmation</button>
-        </div>
-    </div>
 
     <br>
 
@@ -294,248 +293,11 @@
 
 
 <script src="js/template.js" type="application/javascript"></script>
-
-
+<script src="js/brand.js" type="application/javascript"></script>
+<script src="vue/admin.js"></script>
 
 <script>
-    String.prototype.replaceAll = function (target, replacement) {
-        return this.split(target).join(replacement);
-    };
 
-    var app = new Vue({
-        el: '#app',
-        data: {
-            companies: [],
-            brands: [],
-            templates: [],
-            companyBrands: [],
-            brandTemplates: [],
-            selectedCompany: "",
-            selectedBrand: "",
-            selectedTemplate: "",
-            newBrandName: "",
-            newTemplateName: "",
-            template_code: "\n\n",
-            templateFiles: [],
-            confirmation: {title:"", text:"", result: false},
-            updloadingFiles: []
-        },
-        methods: {
-            yesNoConfirm: function(title, text){
-                var main = this;
-                this.confirmation.title = title;
-                this.confirmation.text = text;
-                $("#confirmationModal").modal();
-                return new Promise(function (resolve) {
-                    $("#confirmationModal").on("hidden.bs.modal", function()
-                    {
-                        console.log(main.confirmation.result);
-                        resolve(main.confirmation.result);
-                    });
-                })
-
-
-            },
-
-            confirmationResult: function(res){
-                this.confirmation.result = res;
-                $("#confirmationModal").modal("hide");
-            },
-            test: function(){
-                this.yesNoConfirm("test","test")
-                        .then(function(res){
-                            alert(res);
-                        });
-            },
-            companyInfo: function (company) {
-                this.companyBrands = this.brands.filter(brand => (brand["COMPANY_ID"] == company.ID)
-                )
-                ;
-                console.log(this.companyBrands);
-                this.selectedCompany = company;
-                $("#companyInfoModal").modal('show');
-
-            },
-            brandInfo: function (brand) {
-                this.brandTemplates = this.templates.filter(template => (template["BRAND_ID"] == brand.ID));
-                console.log(this.brandTemplates);
-                this.selectedBrand = brand;
-                $("#brandInfoModal").modal('show');
-            },
-            //
-            //  ------------------------------РАБОТАЕМ С ШАБЛОНОМ!!!
-            cutFileName: function(file){
-                var returnFileName = "";
-                if(file.length > 20){
-                    return file.substr(0, 18) + "...";
-                }else
-                {
-                    return file;
-                }
-            },
-            deleteFile: function(file){
-                var main = this;
-                this.yesNoConfirm("Удаление файла","Удалить файл "+file+"?")
-                    .then(function(res) {
-                        if(res) {
-                            templateModule.deleteFile(main.selectedTemplate.ID, file)
-                                .then(function(res){
-                                    main.templateFiles = res['files'];
-                                });
-                        }else{
-                            console.log("Отмена...");
-                        }
-                     })
-
-            },
-            templateInfo: function (template) {
-                var main = this;
-                main.selectedTemplate = template;
-                templateModule.getTemplateCode(main.selectedTemplate.ID)
-                    .then(function(res){
-                        main.template_code = res;
-                        return templateModule.getTemplateFiles(main.selectedTemplate.ID);
-                    })
-                    .then(function(res){
-                        console.log(res);
-                        main.templateFiles = res['files'];
-                        var padding = parseInt($("#templateCodeElement").css("padding-top")) + 1;
-                        $("#fileListElement").height(24*20 + padding * 2) ;
-                        $('#templateInfoModal').modal('show');
-                        //$("#fileListElement").height(height);
-                    });
-
-            },
-
-            addTemplate: function (template) {
-                var session_id = localStorage.getItem("session_id");
-                var main = this;
-                var template_name = main.newTemplateName;
-                $.ajax({
-                    type: "POST",
-                    url: "../../template/add/" + session_id + "?brand_id=" + main.selectedBrand.ID,
-                    contentType: "application/json",
-                    data: JSON.stringify({"template_name": template_name})
-                }).done(function (dt) {
-                    $.ajax({
-                        type: "GET",
-                        url: "../../template/" + session_id + "/admin",
-                        data: []
-                    }).done(function (dt) {
-                        console.log(dt);
-                        main.templates = dt['templates'];
-                        main.brandTemplates = main.templates.filter(template => (template["BRAND_ID"] == main.selectedBrand.ID)
-                        )
-                        ;
-                    });
-                });
-            },
-            upload: function () {
-                var main = this;
-                //var arr = {1:1,2:2};
-                var chain = Promise.resolve();
-                var steps = -1;
-                var session_id = localStorage.getItem("session_id");
-                //console.log(this.files)
-                new Promise(function (resolve) {
-                    for (var x = 0; x < main.updloadingFiles.length; x++) {
-                        //var files = main.files;
-                        chain = chain.then(function () {
-                            return new Promise(function (res) {
-                                steps++;
-                                var formData = new FormData();
-                                formData.append("file", main.updloadingFiles[steps])
-                                $.ajax({
-                                    type: "POST",
-                                    url: "../../server/upload/" + session_id + "?template_id=" + main.selectedTemplate.ID,
-                                    //contentType: "text",
-                                    //dataType: "text",
-                                    data: formData,
-                                    processData: false,  // tell jQuery not to process the data
-                                    contentType: false  // tell jQuery not to set contentType
-                                }).done(function () {
-                                    res("SUCCESS");
-                                    if (steps == main.updloadingFiles.length - 1) {
-                                        resolve("SUCCESS")
-                                    }
-                                }).fail(function (err) {
-                                    console.error(err);
-                                    res("ERR");
-                                });
-
-                            })
-
-                        });
-                    }
-                }).then(function (res) {
-                    main.updloadingFiles = [];
-                    return templateModule.getTemplateFiles(main.selectedTemplate.ID)
-                }).then(function(res){
-                    main.templateFiles = res['files'];
-                })
-
-                ;
-            },
-
-            onFileChange: function (e) {
-                this.updloadingFiles = e.target.files || e.dataTransfer.files;
-                if (!this.updloadingFiles.length)
-                    return;
-                //this.createImage(files[0]);
-            }
-            ,
-            saveTemplate: function () {
-                var code = this.template_code;
-                console.log(code);
-                $.ajax({
-                    type: "POST",
-                    url: "../../server/templatecode/" + this.selectedTemplate,
-                    contentType: "text",
-                    dataType: "text",
-                    data: code
-                }).done(function (dt) {
-                    $('#myModal').modal('hide');
-                });
-
-
-            }
-            ,
-
-
-        },
-        mounted: function () {
-            var main = this;
-            var session_id = localStorage.getItem("session_id");
-            console.log(session_id);
-            var main = this;
-            $.ajax({
-                type: "GET",
-                url: "../../company/" + session_id + "/admin",
-                data: []
-            }).done(function (dt) {
-                console.log(dt);
-                main.companies = dt['companies'];
-            });
-            $.ajax({
-                type: "GET",
-                url: "../../brand/" + session_id + "/admin",
-                data: []
-            }).done(function (dt) {
-                console.log(dt);
-                main.brands = dt['brands'];
-            });
-            $.ajax({
-                type: "GET",
-                url: "../../template/" + session_id + "/admin",
-                data: []
-            }).done(function (dt) {
-                console.log(dt);
-                main.templates = dt['templates'];
-            });
-
-
-        }
-    })
 </script>
 
 
