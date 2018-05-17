@@ -56,6 +56,20 @@ var brandModule = {
         });
 
 
+    },
+    getRuleUsers: function(brand_id){
+        var session_id = localStorage.getItem("session_id");
+        return new Promise(function (resolve) {
+            $.ajax({
+                type: "GET",
+                url: "../../brand/roles/list/" + session_id + "?brand_id=" + brand_id,
+                data: []
+            }).done(function (dt) {
+                console.log(dt);
+                resolve(dt);
+            });
+        });
+        
     }
 }
 

@@ -18,9 +18,10 @@
     <style type="text/css">.CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}</style>
     -->
 </head>
-<body>
+<body class="bg-light">
 
-<div id="app">
+<div id="app" >
+
     <div class="modal fade" role="dialog" id="companyInfoModal">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -31,7 +32,8 @@
                 <div class="modal-body">
                     <div class="container-fluid">
                         <div class="form-check">
-                            <input type="checkbox" class="form-check-input" v-model="showArchiveBrands" id="showArchivedModal">
+                            <input type="checkbox" class="form-check-input" v-model="showArchiveBrands"
+                                   id="showArchivedModal">
                             <label class="form-check-label" for="showArchivedModal">Показать архивные</label>
                         </div>
                         <hr>
@@ -190,6 +192,28 @@
 
         </div>
     </div>
+
+    <div id="ruleModal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header h-25" style="background-color: lightgrey !important;">
+                    <h5 class="modal-title">{{ruleTitle}}</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+
+                    <ul class="list-group" style="padding-left: 0px">
+
+                        <li v-for="user in ruleUsers" class="list-group-item list-group-item-primary">
+                           {{ user.EMAIL }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="confirmationModal" class="modal fade" role="dialog">
         <div class="modal-dialog modal-sm">
             <!-- Modal content-->
@@ -268,12 +292,11 @@
                             </div>
                             <div class="card-body">
                                 <div class="row mb-1">
-                                    <select class="custom-select">
+                                    <select class="custom-select" v-model="brandToEdit">
 
-                                        <option v-for="brand in brands" class="dropdown-item" value="brand.ID">{{
+                                        <option v-for="brand in brands" class="dropdown-item" v-bind:value=brand>{{
                                             brand.NAME
                                             }}
-                                        </option>
                                         </option>
                                     </select>
                                 </div>
@@ -324,10 +347,6 @@
 <script src="js/template.js" type="application/javascript"></script>
 <script src="js/brand.js" type="application/javascript"></script>
 <script src="vue/admin.js"></script>
-
-<script>
-
-</script>
 
 
 <!--

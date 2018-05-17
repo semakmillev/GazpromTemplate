@@ -34,3 +34,45 @@ def update_table_rules(id, **kwargs):
     c.close()
     connection.close()
 
+
+def get_brand_rules(id):
+    connection = create()
+    c = connection.cursor()
+    sql = 'select p.*, r.ROLE ' \
+          '  from rules r,' \
+          '       people p ' \
+          ' where r.BRAND_ID = ?' \
+          '   and p.ID = r.USER_ID'
+    c.execute(sql, [id])
+    rows = c.fetchall()
+    c.close()
+    connection.close()
+    return [dict(row) for row in rows]
+
+def get_company_rules(id):
+    connection = create()
+    c = connection.cursor()
+    sql = 'select p.*, r.ROLE ' \
+          '  from rules r,' \
+          '       people p ' \
+          ' where r.COMPANY_ID = ?' \
+          '   and p.ID = USER_ID'
+    c.execute(sql, [id])
+    rows = c.fetchall()
+    c.close()
+    connection.close()
+    return [dict(row) for row in rows]
+
+def get_template_rules(id):
+    connection = create()
+    c = connection.cursor()
+    sql = 'select p.*, r.ROLE ' \
+          '  from rules r,' \
+          '       people p ' \
+          ' where r.TEMPLATE_ID = ?' \
+          '   and p.ID = USER_ID'
+    c.execute(sql, [id])
+    rows = c.fetchall()
+    c.close()
+    connection.close()
+    return [dict(row) for row in rows]

@@ -19,7 +19,10 @@ var app = new Vue({
         template_code: "\n\n",
         templateFiles: [],
         confirmation: {title: "", text: "", result: false},
-        updloadingFiles: []
+        updloadingFiles: [],
+        brandToEdit: "",
+        ruleTitle: "",
+        ruleUsers: []
     },
     methods: {
         yesNoConfirm: function (title, text) {
@@ -231,6 +234,18 @@ var app = new Vue({
 
         }
         ,
+        brandRoles: function(){
+            let main = this;
+            brandModule.getRuleUsers(this.brandToEdit.ID)
+                .then(function(res){
+                    console.log(res['users']);
+                    main.ruleUsers = res['users'];
+                    console.log(main.brandToEdit.NAME);
+                    main.ruleTitle = main.brandToEdit.NAME;
+                    $('#ruleModal').modal('show');
+                })
+
+        }
 
 
     },
