@@ -3,7 +3,7 @@ import admin_app
 from server import template
 from server import brand
 from server import company
-
+from server import rules
 
 if __name__ == '__main__':
     ## host='0.0.0.0'

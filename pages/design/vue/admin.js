@@ -245,7 +245,17 @@ var app = new Vue({
                     $('#ruleModal').modal('show');
                 })
 
+        },
+        deleteBrandRole: function (rule_id) {
+            let main = this;
+            ruleModule.deleteRule(rule_id, "brand", this.brandToEdit.ID)
+                .then(function(res){
+                    main.ruleUsers = res['users'];
+                })
+            ;
+
         }
+
 
 
     },

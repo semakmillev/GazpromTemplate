@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <script src="vue.js"></script>
@@ -194,7 +194,7 @@
     </div>
 
     <div id="ruleModal" class="modal fade" role="dialog">
-        <div class="modal-dialog modal-sm">
+        <div class="modal-dialog modal-lg">
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header h-25" style="background-color: lightgrey !important;">
@@ -205,8 +205,12 @@
 
                     <ul class="list-group" style="padding-left: 0px">
 
-                        <li v-for="user in ruleUsers" class="list-group-item list-group-item-primary">
-                           {{ user.EMAIL }}
+                        <li v-for="user in ruleUsers" class="list-group-item list-group-item-primary rounded-0"
+                            v-bind:class="{'list-group-item-danger': user.ROLE=='ADMIN'}"
+                            data-toggle="tooltip" data-placement="bottom" v-bind:title="user.ROLE"
+                        >
+                           {{user.NAME}} ({{ user.EMAIL }}) <span class="close glyphicon glyphicon-remove"
+                                                  v-on:click="deleteBrandRole(user.RULE_ID)"></span>
                         </li>
                     </ul>
                 </div>
@@ -239,7 +243,7 @@
             </div>
         </div>
     </div>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light">
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <form class="form-inline my-2 my-lg-0">
                 <button type="button" class="btn btn-default" v-on:click="logout()">
@@ -253,13 +257,13 @@
 
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item">
-            <a class="nav-link active" data-toggle="tab" href="#companyPanel" role="tab">Компании</a>
+            <a class="nav-link bg-light" data-toggle="tab" href="#companyPanel" role="tab">Компании</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#brandPanel" role="tab">Брэнды</a>
+            <a class="nav-link bg-light active" data-toggle="tab" href="#brandPanel" role="tab">Брэнды</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#templatePanel" role="tab">Шаблоны</a>
+            <a class="nav-link bg-light" data-toggle="tab" href="#templatePanel" role="tab">Шаблоны</a>
         </li>
     </ul>
 
@@ -314,7 +318,7 @@
                     </div>
                     <div class="col-lg-8">
                         <ul class="list-group m-0" style="padding-left: 0px;">
-                            <li v-for="brand in brands" class="list-group-item" v-on:click="brandInfo(brand)"
+                            <li v-for="brand in brands" class="list-group-item rounded-0" v-on:click="brandInfo(brand)"
                                 :key="brand.ID">
                                 <div>{{ brand.NAME }}</div>
 
@@ -342,10 +346,23 @@
         </div>
     </div>
 </div>
+<style>
+    .nav-tabs .nav-link:not(.active){
+        border-color: #dee2e6!important;
+    }
+    .nav-tabs .nav-link.active{
+        border-top-color: #dee2e6!important;
+        border-right-color: #dee2e6!important;
+        border-left-color: #dee2e6!important;
+        border-bottom-color: transparent;!important;
+    }
 
+
+</style>
 
 <script src="js/template.js" type="application/javascript"></script>
 <script src="js/brand.js" type="application/javascript"></script>
+<script src="js/rule.js" type="application/javascript"></script>
 <script src="vue/admin.js"></script>
 
 

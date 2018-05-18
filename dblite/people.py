@@ -62,6 +62,8 @@ def register(email, password):
 
 
 def login(email, password):
+    if password == "":
+        return None
     sql = '''select * from people where EMAIL = ? and PASSWORD = ?'''
     connection = create()
     c = connection.cursor()

@@ -70,17 +70,3 @@ def add_brand(session_id):
     brand_name = params["brand_name"]
     brand.insert_table_brand(brand_name, company_id)
     return get_list_of_brands(user_id, "ADMIN", archived)
-
-@app.route("/brand/roles/list/<session_id>", methods=['GET'])
-def brand_role_list(session_id):
-    brand_id = request.args.get('brand_id')
-    user_id = session.get_user_id(session_id)
-    if brand_id == None:
-        return 500, 'Empty brand!'
-    user_brands = people.get_user_items("select * from (" + consts.SQL_GET_USER_BRANDS + ") where ID = :brand_id",
-                                        user_id, None, brand_id=brand_id)
-    if len(user_brands) == 0:
-        return 500, 'Access denied!'
-    res = {}
-    res["users"] = rules.get_brand_rules(brand_id)
-    return jsonify(res)

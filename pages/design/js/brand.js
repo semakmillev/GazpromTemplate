@@ -62,7 +62,7 @@ var brandModule = {
         return new Promise(function (resolve) {
             $.ajax({
                 type: "GET",
-                url: "../../brand/roles/list/" + session_id + "?brand_id=" + brand_id,
+                url: "../../rules/brand/list/" + session_id + "?brand_id=" + brand_id,
                 data: []
             }).done(function (dt) {
                 console.log(dt);

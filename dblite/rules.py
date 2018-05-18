@@ -1,4 +1,7 @@
+import uuid
+
 from dblite import create
+from dblite import people, consts
 
 CREATE_SCRIPT = '''
   CREATE TABLE rules(USER_ID INTEGER,
@@ -18,6 +21,7 @@ def insert_table_rules(user_id, template_id, brand_id, company_id, role):
               (user_id, template_id, brand_id, company_id, role))
     last_id = c.lastrowid
     c.close()
+    connection.commit()
     connection.close()
     return last_id
 
@@ -34,11 +38,19 @@ def update_table_rules(id, **kwargs):
     c.close()
     connection.close()
 
+def delete_rule(id):
+    connection = create()
+    c = connection.cursor()
+    sql = 'delete from rules where id = ?'
+    c.execute(sql, [id])
+    c.close()
+    connection.commit()
+    connection.close()
 
 def get_brand_rules(id):
     connection = create()
     c = connection.cursor()
-    sql = 'select p.*, r.ROLE ' \
+    sql = 'select p.*, r.ROLE, r.ID RULE_ID ' \
           '  from rules r,' \
           '       people p ' \
           ' where r.BRAND_ID = ?' \
@@ -52,7 +64,7 @@ def get_brand_rules(id):
 def get_company_rules(id):
     connection = create()
     c = connection.cursor()
-    sql = 'select p.*, r.ROLE ' \
+    sql = 'select p.*, r.ROLE, r.ID RULE_ID ' \
           '  from rules r,' \
           '       people p ' \
           ' where r.COMPANY_ID = ?' \
@@ -66,7 +78,7 @@ def get_company_rules(id):
 def get_template_rules(id):
     connection = create()
     c = connection.cursor()
-    sql = 'select p.*, r.ROLE ' \
+    sql = 'select p.*, r.ROLE, r.ID RULE_ID ' \
           '  from rules r,' \
           '       people p ' \
           ' where r.TEMPLATE_ID = ?' \
@@ -76,3 +88,31 @@ def get_template_rules(id):
     c.close()
     connection.close()
     return [dict(row) for row in rows]
+
+
+def check_rule_access(user_id, source, item_id):
+    user_items = []
+    if source == 'template':
+        user_items = people.get_user_items(
+            "select * from (" + consts.SQL_GET_USER_TEMPLATES + ") where ID = :template_id",
+            user_id, None, template_id=item_id)
+    elif source == 'brand':
+        user_items = people.get_user_items(
+            "select * from (" + consts.SQL_GET_USER_BRANDS + ") where ID = :brand_id",
+            user_id, None, brand_id=item_id)
+    elif source == 'company':
+        user_items = people.get_user_items(
+            "select * from (" + consts.SQL_GET_USER_COMPANIES + ") where ID = :company_id",
+            user_id, None, company_id=item_id)
+    return len(user_items) > 0
+
+def send_invitation(email):
+    sid = str(uuid.uuid4())
+    sql = "insert into invitation values(:sid,:email)"
+    connection = create()
+    cursor = connection.cursor()
+    cursor.execute(sql, {'sid': sid, 'email': email})
+    # send email here
+    cursor.close()
+    connection.commit()
+    connection.close()
