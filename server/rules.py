@@ -77,7 +77,7 @@ def delete_rule(source, session_id):
 
 
 @app.route("/rules/add/<source>/<session_id>", methods=['POST'])
-def delete_rule(source, session_id):
+def add_rule(source, session_id):
     # template_id = request.args.get('template_id')
     item_id = request.args.get('item_id')
     user_id = session.get_user_id(session_id)

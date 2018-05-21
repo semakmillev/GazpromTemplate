@@ -61,3 +61,9 @@ select t.ID, t.NAME, t.BRAND_ID, t.PATH
    and r.ROLE = IFNULL(:user_role,r.ROLE)
 
 '''
+
+SQL_GET_BRAND_USERS = '''
+select r.USER_ID, r.ROLE
+  from rules r
+ where COMPANY_ID = select b.company_id from brand b where id = :brand_id
+'''
