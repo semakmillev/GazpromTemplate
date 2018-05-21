@@ -21,6 +21,17 @@
 <body class="bg-light">
 
 <div id="app" >
+    <nav class="navbar navbar-expand-lg navbar-light bg-dark">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+            </ul>
+            <form class="form-inline my-2 my-lg-0">
+                <button type="button" class="btn btn-default" v-on:click="logout()">
+                    <span class="glyphicon glyphicon-log-out"></span> Log out
+                </button>
+            </form>
+        </div>
+    </nav>
 
     <div class="modal fade" role="dialog" id="companyInfoModal">
         <div class="modal-dialog modal-lg">
@@ -206,10 +217,12 @@
                     <ul class="list-group" style="padding-left: 0px">
 
                         <li v-for="user in ruleUsers" class="list-group-item list-group-item-primary rounded-0"
-                            v-bind:class="{'list-group-item-danger': user.ROLE=='ADMIN'}"
+                            v-bind:class="{'list-group-item-light': user.ROLE=='OWNER',
+                                           'list-group-item-danger': user.ROLE=='ADMIN'}"
+
                             data-toggle="tooltip" data-placement="bottom" v-bind:title="user.ROLE"
                         >
-                           {{user.NAME}} ({{ user.EMAIL }}) <span class="close glyphicon glyphicon-remove"
+                           {{user.NAME}} ({{ user.EMAIL }}) <span v-if="user.ROLE != 'OWNER'" class="close glyphicon glyphicon-remove"
                                                   v-on:click="deleteBrandRole(user.RULE_ID)"></span>
                         </li>
                     </ul>
@@ -243,24 +256,18 @@
             </div>
         </div>
     </div>
-    <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <form class="form-inline my-2 my-lg-0">
-                <button type="button" class="btn btn-default" v-on:click="logout()">
-                    <span class="glyphicon glyphicon-log-out"></span> Log out
-                </button>
-            </form>
-        </div>
-    </nav>
+
+
+
 
     <br>
 
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item">
-            <a class="nav-link bg-light" data-toggle="tab" href="#companyPanel" role="tab">Компании</a>
+            <a class="nav-link bg-light active" data-toggle="tab" href="#companyPanel" role="tab">Организации</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link bg-light active" data-toggle="tab" href="#brandPanel" role="tab">Брэнды</a>
+            <a class="nav-link bg-light" data-toggle="tab" href="#brandPanel" role="tab">Брэнды</a>
         </li>
         <li class="nav-item">
             <a class="nav-link bg-light" data-toggle="tab" href="#templatePanel" role="tab">Шаблоны</a>

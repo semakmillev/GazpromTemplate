@@ -240,7 +240,7 @@ var app = new Vue({
                 .then(function(res){
                     console.log(res['users']);
                     main.ruleUsers = res['users'];
-                    console.log(main.brandToEdit.NAME);
+                    console.log(main.ruleUsers[0]);
                     main.ruleTitle = main.brandToEdit.NAME;
                     $('#ruleModal').modal('show');
                 })

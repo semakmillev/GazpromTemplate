@@ -63,7 +63,20 @@ select t.ID, t.NAME, t.BRAND_ID, t.PATH
 '''
 
 SQL_GET_BRAND_USERS = '''
-select r.USER_ID, r.ROLE
-  from rules r
- where COMPANY_ID = select b.company_id from brand b where id = :brand_id
+select r.ID ID, r.USER_ID USER_ID, u.NAME NAME, u.EMAIL EMAIL,  'OWNER' as ROLE
+  from rules r,
+       people u
+ where COMPANY_ID = (select b.company_id from brand b where id = :brand_id)
+   and r.USER_ID = u.ID
+ union
+select r.ID ID, r.USER_ID USER_ID, u.NAME NAME, u.EMAIL EMAIL, r.ROLE ROLE
+  from rules r,
+       people u
+ where r.BRAND_ID = :brand_id
+   and r.USER_ID = u.ID
+   and user_id not in (select r.USER_ID
+                         from rules r
+                        where COMPANY_ID = (select b.company_id from brand b where id = :brand_id)
+                        )
+
 '''

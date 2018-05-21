@@ -11,6 +11,8 @@ var app = new Vue({
         loginEmail: "",
         loginPassword: "",
         registerEmail: "",
+        brands: "",
+        projects: "",
         registerPassword: "",
         repeatRegisterPassword: "",
         template_height: 500,

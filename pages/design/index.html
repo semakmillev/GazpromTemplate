@@ -51,6 +51,44 @@
             </form>
         </div>
     </nav>
+    <br>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2">
+                <div class="card">
+                    <div class="card-header">
+                        Выбор брэнда
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-1">
+                            <label for="selectedBrand">Бренд</label>
+                            <select class="custom-select" v-model="selectedBrand" id="selectedBrand">
+
+                                <option v-for="brand in brands" class="dropdown-item" v-bind:value=brand>{{
+                                    brand.NAME
+                                    }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="row mb-1">
+                            <label for="selectedProject">Кампания</label>
+                            <select class="custom-select" v-model="selectedProject" id="selectedProject">
+
+                                <option v-for="project in projects" class="dropdown-item" v-bind:value=project>{{
+                                    project.NAME
+                                    }}
+                                </option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <br>
     <!--
     <div class="modal fade" role="dialog" id="loginModal">
         <div class="modal-dialog modal-lg">

@@ -38,6 +38,7 @@ def update_table_rules(id, **kwargs):
     c.close()
     connection.close()
 
+
 def delete_rule(id):
     connection = create()
     c = connection.cursor()
@@ -47,19 +48,17 @@ def delete_rule(id):
     connection.commit()
     connection.close()
 
+
 def get_brand_rules(id):
     connection = create()
     c = connection.cursor()
-    sql = 'select p.*, r.ROLE, r.ID RULE_ID ' \
-          '  from rules r,' \
-          '       people p ' \
-          ' where r.BRAND_ID = ?' \
-          '   and p.ID = r.USER_ID'
-    c.execute(sql, [id])
+    sql = consts.SQL_GET_BRAND_USERS
+    c.execute(sql, {"brand_id": id})
     rows = c.fetchall()
     c.close()
     connection.close()
     return [dict(row) for row in rows]
+
 
 def get_company_rules(id):
     connection = create()
@@ -74,6 +73,7 @@ def get_company_rules(id):
     c.close()
     connection.close()
     return [dict(row) for row in rows]
+
 
 def get_template_rules(id):
     connection = create()
@@ -105,6 +105,7 @@ def check_rule_access(user_id, source, item_id):
             "select * from (" + consts.SQL_GET_USER_COMPANIES + ") where ID = :company_id",
             user_id, None, company_id=item_id)
     return len(user_items) > 0
+
 
 def send_invitation(email):
     sid = str(uuid.uuid4())
