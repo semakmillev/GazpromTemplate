@@ -11,3 +11,4 @@ exiftool.exe
 *.tiff
 *.pdf
 templates/company*
+template.db

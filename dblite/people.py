@@ -49,11 +49,12 @@ def update_table_people(id, **kwargs):
 def register(email, password):
     connection = create()
     cur = connection.cursor()
-    rows = cur.execute("select * from people where EMAIL = ?", email)
+    cur.execute("select * from people where EMAIL = ?", [email])
+    rows = cur.fetchall()
     if len(rows) == 0:
         user_id = insert_table_people("", email, password, "", "", "", "", 0)
     else:
-        if not rows[0]['PASSWORD'] is None or not rows[0]['PASSWORD'] == "":
+        if not (rows[0]['PASSWORD'] is None or rows[0]['PASSWORD'] == ""):
             raise ValueError('User already exists')
         user_id = rows[0]["ID"]
         update_table_people(user_id, password=password)
