@@ -32,14 +32,19 @@ def combine_layers(background, foreground_layer):
     return background
 
 
-def generate_picture(template_name, width, height, output="JPEG", resolution=60.0):
-    extension = output.replace("JPEG","JPG").lower()
-    file_name = os.path.dirname(__file__) + "/" + str(uuid.uuid4()) + "." + extension
+def generate_picture(template_path, width, height, output="JPEG", resolution=60.0, user_id=None, preview=False, ):
+    extension = output.replace("JPEG", "JPG").lower()
+    uid = str(uuid.uuid4())
+    if preview:
+        file_name = os.path.dirname(__file__) + "/pages/design/preview_" + str(user_id) + "_" + uid + "." + extension
+    else:
+        file_name = os.path.dirname(__file__) + "/result_" + str(user_id) + "_" + uid + "." + extension
+
     f = open(file_name, 'a')
     from templates.Layer import Layer
     Layer.image_height = int(height)
     Layer.image_width = int(width)
-    a = os.path.abspath(os.path.dirname(__file__)) + "/templates/%s/template.py" % template_name
+    a = os.path.abspath(os.path.dirname(__file__)) + "/templates/%s/template.py" % template_path
     print a
     foo = imp.load_source("Layer", a)
     layers = foo.layers
@@ -55,7 +60,8 @@ def generate_picture(template_name, width, height, output="JPEG", resolution=60.
 
     from_ = ImageCms.get_display_profile()
 
-    transform = ImageCms.buildTransformFromOpenProfiles("sRGB_Color_Space_Profile.icm", "ISOcoated_v2_300_eci.icc", "RGBA", "CMYK")
+    transform = ImageCms.buildTransformFromOpenProfiles("sRGB_Color_Space_Profile.icm", "ISOcoated_v2_300_eci.icc",
+                                                        "RGBA", "CMYK")
     final = ImageCms.applyTransform(final, transform)
 
     if output == "PDF":
@@ -66,9 +72,12 @@ def generate_picture(template_name, width, height, output="JPEG", resolution=60.
     elif output == "JPEG":
         final.save(file_name, output, dpi=(resolution, resolution))
         sleep(0.1)
-        s = "exiftool -XResolution=%s -YResolution=%s %s"%(int(resolution), int(resolution), file_name)
+        s = "exiftool -XResolution=%s -YResolution=%s %s" % (int(resolution), int(resolution), file_name)
+        print "!"
         call(s, shell=True)
+
     # final.save(file_name, output)
+    print "!!!"
     return file_name
 
 

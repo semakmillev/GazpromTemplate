@@ -30,7 +30,7 @@ select b.ID, b.NAME, b.COMPANY_ID, b.ARCHIVED
 
 
 SQL_GET_USER_TEMPLATES = '''
-select t.ID, t.NAME, t.BRAND_ID, t.PATH, t.PROJECT, b.NAME BRAND_NAME
+select t.ID, t.NAME, t.BRAND_ID, t.PATH PATH, t.PROJECT, b.NAME BRAND_NAME
   from company c,
        brand b,
        template t,

@@ -81,6 +81,27 @@ def get_template_code(template_name):
     # res = [{"name": o} for o in os.listdir(d) if os.path.isdir(os.path.join(d, o))]
     return file.read()
 '''
+@app.route('/server/preview/<template_id>/<session_id>')
+def get_preview(template_id, session_id):
+    mimetypes = {
+        ".png": "image/png",
+        ".jpg": "image/jpeg"
+    }
+    user_id = session.get_user_id(session_id)
+    user_templates = people.get_user_items("select * from (" + SQL_GET_USER_TEMPLATES + ") where ID = :template_id",
+                                           user_id, None,
+                                           template_id=template_id)
+    if len(user_templates) == 0:
+        return "Access denied", 500
+    template = user_templates[0]
+    mimetype = mimetypes.get(".jpg", "text/html")
+    file_path = os.path.abspath(os.path.dirname(__file__)) + '/templates/%s/files/preview.jpg' % template["PATH"]
+    return send_file(
+        file_path,
+        mimetype,
+        attachment_filename=file_path,
+        cache_timeout=0
+    ), 200
 
 
 @app.route('/server/templatecode/<session_id>', methods=['GET'])
@@ -122,13 +143,46 @@ def set_template_code(template_name):
     return "OK"  # file.read()
 
 
-@app.route('/server/<template_name>', methods=['POST'])
-def generate_template(template_name):
+
+
+@app.route('/server/generate/<template_id>/<session_id>', methods=['POST'])
+def generate_template(template_id, session_id):
+    user_id = session.get_user_id(session_id)
+    print user_id, template_id
+    user_templates = people.get_user_items("select * from (" + SQL_GET_USER_TEMPLATES + ") where ID = :template_id",
+                                           user_id, None,
+                                           template_id=template_id)
+
     params = json.loads(request.data)
     template_request = parse_template_request(params)
-    file_name = main.generate_picture(template_name, template_request.width, template_request.height,
-                                      template_request.format, float(template_request.dpi))
-    return send_file(file_name)
+    if len(user_templates) == 0:
+        print "Access denied"
+        return "Access denied", 500
+    user_template = user_templates[0]
+    file_name = main.generate_picture(user_template["PATH"], template_request.width, template_request.height,
+                                      template_request.format, float(template_request.dpi), user_id=user_id)
+    return send_file(file_name), 200
+
+@app.route('/server/generate/preview/<template_id>/<session_id>', methods=['POST'])
+def generate_template_preview(template_id, session_id):
+    user_id = session.get_user_id(session_id)
+    print user_id, template_id
+    user_templates = people.get_user_items("select * from (" + SQL_GET_USER_TEMPLATES + ") where ID = :template_id",
+                                           user_id, None,
+                                           template_id=template_id)
+
+    params = json.loads(request.data)
+    template_request = parse_template_request(params)
+    if len(user_templates) == 0:
+        print "Access denied"
+        return "Access denied", 500
+    user_template = user_templates[0]
+
+    template_request.height = int(template_request.height * 640 / template_request.width)
+    template_request.width = 640
+    file_name = main.generate_picture(user_template["PATH"], template_request.width, template_request.height,
+                                      "JPEG", float(96), user_id=user_id, preview=True)
+    return os.path.basename(file_name), 200
 
 
 @app.route('/server/upload/<session_id>', methods=['POST'])

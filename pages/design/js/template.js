@@ -78,6 +78,20 @@ var templateModule ={
                 resolve(dt)
             });
         });
+    },
+    preview: function(template_id, data){
+        let session_id = localStorage.getItem("session_id");
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: "POST",
+                url: "../../server/generate/preview/" + template_id +"/" + session_id,
+                contentType: "application/json",
+                data: JSON.stringify(data)
+            }).done(function (dt) {
+                resolve(dt);
+            });
+        });
     }
+
 
 }

@@ -7,9 +7,12 @@ var app = new Vue({
     el: '#app',
     data: {
         items: [], //[{id: 1, name: 'semak'}, {id: 2, name: 'ter'}],
-        imgs: ["1.jpg","2.jpg","6.jpg","3.jpg","4.jpg","5.jpg",],
+        // imgs: ["1.jpg","2.jpg","6.jpg","3.jpg","4.jpg","5.jpg",],
+        imgs: [],
         templates: [],
+        previewImg: "",
         selectedTemplate: "",
+        selectedTemplateId : "",
         selectedBrand: "",
         selectedProject: "",
         loginEmail: "",
@@ -32,22 +35,28 @@ var app = new Vue({
     methods: {
         showTemplates: function () {
 
-          console.log(this.selectedBrand.ID);
-
-          let main = this;
-          let brandTemplates = main.templates.filter(template => (template["BRAND_ID"] == main.selectedBrand.ID));
-          console.log(brandTemplates);
-          main.projects = $.unique(brandTemplates.map(function (t) {return t.PROJECT;}));
-          if(this.selectedProject != ""){
-              brandTemplates = brandTemplates.filter(template => (template["PROJECT"] == main.selectedProject));
-          }
-
+            console.log(this.selectedBrand.ID);
+            let session_id = localStorage.getItem("session_id");
+            let main = this;
+            let brandTemplates = main.templates.filter(template => (template["BRAND_ID"] == main.selectedBrand.ID));
+            console.log(brandTemplates);
+            main.projects = $.unique(brandTemplates.map(function (t) {
+                return t.PROJECT;
+            }));
+            if (this.selectedProject != "") {
+                brandTemplates = brandTemplates.filter(template => (template["PROJECT"] == main.selectedProject));
+            }
+            this.imgs = brandTemplates.map(function (t) {
+                return {ID: t.ID, NAME: t.NAME, PATH: "../../server/preview/" + t.ID + "/" + session_id}
+            });
 
         },
-        click: function (text) {
-            console.log(text);
-            this.selectedTemplate = text;
-            //model.message = 'New value';
+        selectTemplate: function(template){
+            console.log(template);
+            this.selectedTemplate = template.NAME;
+            this.selectedTemplateId = template.ID;
+            //this.selectedTemplate.NAME = template.NAME;
+            //this.selectedTemplate.ID = template.ID;
         },
         upload: function () {
             var main = this;
@@ -227,21 +236,43 @@ var app = new Vue({
 
             });
         },
-        downloadTemplate: function () {
-            var main = this;
-            console.log(this.selectedTemplate);
-            console.log(this.template_width);
-            console.log(this.template_height);
-            console.log(this.format);
-            var extension = this.format.replace("JPEG", "JPG").toLowerCase();
-            var request_data = {
+        preview: function(){
+            let main = this;
+            let request_data = {
                 "width": this.template_width,
                 "height": this.template_height,
                 "format": this.format,
                 "dpi": this.dpi
             };
-            var http = new XMLHttpRequest();
-            http.open('POST', "../../server/" + this.selectedTemplate, true);
+            main.previewImg = "";
+            let modalHeight = this.template_height *(640/this.template_width);
+            let modalWidth = 640;
+
+            templateModule.preview(this.selectedTemplateId, request_data)
+                .then(function(res){
+                    main.previewImg = res;
+                    $('#previewModal .modal-content').css('width', modalWidth);
+                    $('#previewModal .modal-content').css('height', modalHeight);
+                    $('#previewModal').modal('show');
+            });
+        },
+        downloadTemplate: function () {
+            let main = this;
+            console.log(this.selectedTemplateId);
+            console.log(this.template_width);
+            console.log(this.template_height);
+            console.log(this.format);
+            console.log(this.dpi);
+            let session_id = localStorage.getItem("session_id");
+            let extension = this.format.replace("JPEG", "JPG").toLowerCase();
+            let request_data = {
+                "width": this.template_width,
+                "height": this.template_height,
+                "format": this.format,
+                "dpi": this.dpi
+            };
+            let http = new XMLHttpRequest();
+            http.open('POST', "../../server/generate/" + this.selectedTemplateId+"/"+session_id, true);
             http.setRequestHeader("Content-type", "application/json; charset=utf-8");
             http.setRequestHeader("Content-length", request_data.length);
             http.setRequestHeader("Connection", "close");
