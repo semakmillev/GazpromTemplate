@@ -12,3 +12,4 @@ exiftool.exe
 *.pdf
 templates/company*
 template.db
+/template.db
