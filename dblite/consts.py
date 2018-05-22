@@ -30,7 +30,7 @@ select b.ID, b.NAME, b.COMPANY_ID, b.ARCHIVED
 
 
 SQL_GET_USER_TEMPLATES = '''
-select t.ID, t.NAME, t.BRAND_ID, t.PATH
+select t.ID, t.NAME, t.BRAND_ID, t.PATH, t.PROJECT, b.NAME BRAND_NAME
   from company c,
        brand b,
        template t,
@@ -42,7 +42,7 @@ select t.ID, t.NAME, t.BRAND_ID, t.PATH
    and b.COMPANY_ID = c.ID
    and t.BRAND_ID = b.ID
 UNION ALL
-select t.ID, t.NAME, t.BRAND_ID, t.PATH
+select t.ID, t.NAME, t.BRAND_ID, t.PATH, t.PROJECT, b.NAME BRAND_NAME
   from brand b,
        template t,
        rules r
@@ -52,13 +52,15 @@ select t.ID, t.NAME, t.BRAND_ID, t.PATH
    and r.ROLE = IFNULL(:user_role,r.ROLE)
    and t.BRAND_ID = b.ID
 UNION ALL
-select t.ID, t.NAME, t.BRAND_ID, t.PATH
+select t.ID, t.NAME, t.BRAND_ID, t.PATH, t.PROJECT, b.NAME BRAND_NAME
   from template t,
+       brand b,
        rules r
  where 1=1
    and t.ID = r.TEMPLATE_ID
    and USER_ID = :user_id
    and r.ROLE = IFNULL(:user_role,r.ROLE)
+   and t.BRAND_ID = b.ID
 
 '''
 

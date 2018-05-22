@@ -15,6 +15,7 @@ var templateModule ={
             });
         })
     },
+
     getTemplateCode: function (template_id) {
         var session_id = localStorage.getItem("session_id");
         return new Promise(function (resolve, reject) {
@@ -63,6 +64,18 @@ var templateModule ={
                 data: JSON.stringify({"template_id": template_id})
             }).done(function (dt) {
                 resolve(dt);
+            });
+        });
+    },
+    getListOfTemplates: function() {
+        let session_id = localStorage.getItem("session_id");
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: "GET",
+                url: "../../template/" + session_id + "/user",
+                data: []
+            }).done(function (dt) {
+                resolve(dt)
             });
         });
     }

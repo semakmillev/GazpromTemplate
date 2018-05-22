@@ -7,12 +7,16 @@ var app = new Vue({
     el: '#app',
     data: {
         items: [], //[{id: 1, name: 'semak'}, {id: 2, name: 'ter'}],
+        imgs: ["1.jpg","2.jpg","6.jpg","3.jpg","4.jpg","5.jpg",],
+        templates: [],
         selectedTemplate: "",
+        selectedBrand: "",
+        selectedProject: "",
         loginEmail: "",
         loginPassword: "",
         registerEmail: "",
-        brands: "",
-        projects: "",
+        brands: [],
+        projects: [],
         registerPassword: "",
         repeatRegisterPassword: "",
         template_height: 500,
@@ -22,10 +26,24 @@ var app = new Vue({
         verifyCode: "",
         verifyEmail: "",
         verificationCode: "",
-        dpi: 96,
+        dpi: "",
         files: {}
     },
     methods: {
+        showTemplates: function () {
+
+          console.log(this.selectedBrand.ID);
+
+          let main = this;
+          let brandTemplates = main.templates.filter(template => (template["BRAND_ID"] == main.selectedBrand.ID));
+          console.log(brandTemplates);
+          main.projects = $.unique(brandTemplates.map(function (t) {return t.PROJECT;}));
+          if(this.selectedProject != ""){
+              brandTemplates = brandTemplates.filter(template => (template["PROJECT"] == main.selectedProject));
+          }
+
+
+        },
         click: function (text) {
             console.log(text);
             this.selectedTemplate = text;
@@ -303,11 +321,20 @@ var app = new Vue({
     },
 
     mounted: function () {
-
+        let main = this;
         console.log("session:" + localStorage.getItem("session_id"));
-
+        templateModule.getListOfTemplates()
+            .then(function(dt){
+                main.templates = dt["templates"];
+                main.brands = $.unique(main.templates.map(function (b) {return {'ID': b.BRAND_ID, 'NAME': b.BRAND_NAME};}));
+            });
+        /*
+        brandModule.getListOfBrands("user", false)
+            .then(function (dt) {
+                main.brands = dt['brands'];
+            });
+        */
         if (localStorage.getItem("session_id") == null || localStorage.getItem("session_id") == "null") {
-            let main = this;
             let uri = window.location.search.substring(1);
             let params = new URLSearchParams(uri);
             let invitation = params.get("invitation");
@@ -326,7 +353,6 @@ var app = new Vue({
         }
 
         var session_id = localStorage.getItem("session_id");
-        var main = this;
         $.ajax({
             type: "GET",
             url: "../../server/templatelist/" + session_id,

@@ -52,9 +52,7 @@ var app = new Vue({
         },
         refreshCompanyBrands: function () {
             var main = this;
-            main.companyBrands = main.brands.filter(brand => (brand["COMPANY_ID"] == main.selectedCompany.ID)
-            )
-            ;
+            main.companyBrands = main.brands.filter(brand => (brand["COMPANY_ID"] == main.selectedCompany.ID));
             //return main.brands.filter(main.brand => (brand['COMPANY_ID'] == main.selectedCompany.ID)
             //);
         },
