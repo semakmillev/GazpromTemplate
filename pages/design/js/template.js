@@ -67,6 +67,24 @@ var templateModule ={
             });
         });
     },
+    saveTemplate: function(template, template_code){
+        var session_id = localStorage.getItem("session_id");
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: "POST",
+                url: "../../template/save/" + session_id,
+                contentType: "application/json",
+                data: JSON.stringify({
+                    "id": template.ID,
+                    "name": template.NAME,
+                    "project": template.PROJECT,
+                    "code": template_code
+                })
+            }).done(function (dt) {
+                resolve(dt);
+            });
+        });
+    },
     getListOfTemplates: function() {
         let session_id = localStorage.getItem("session_id");
         return new Promise(function (resolve, reject) {

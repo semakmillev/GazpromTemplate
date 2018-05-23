@@ -1,6 +1,11 @@
+# -*- coding: utf-8 -*-
 import json
 import os
 import shutil
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 from flask import jsonify, request
 from dblite import consts
@@ -20,9 +25,14 @@ def get_file_list(session_id):
     if len(user_templates) == 0:
         return "Access denied", 500
     user_template = user_templates[0]
-    path = os.path.dirname(os.path.abspath(os.path.dirname(__file__))) + "/templates/" + user_template[
-        "PATH"] + "/files/"
-    print path
+    template_path = user_template["PATH"]
+    path = os.path.dirname(os.path.abspath(os.path.dirname(__file__))) + "/templates/%s" % template_path + "/files/"
+    # path = u"%s" % path.decode('cp1251')
+    # .encode('utf8').decode('utf8').replace(" ","_")
+    # path = path.decode(sys.getfilesystemencoding())
+    #print path
+    #tmp = os.listdir(path.decode("unicode_escape"))
+    #print "2"
     files = [f for f in os.listdir(path) if os.path.isfile(path + f)]
     res = {}
     res["files"] = files
@@ -115,3 +125,32 @@ def delete_template(session_id):
     res = {}
     res['templates'] = people.get_user_items(consts.SQL_GET_USER_TEMPLATES, user_id, None)
     return jsonify(res)
+
+
+@app.route("/template/save/<session_id>", methods=['POST'])
+def save_template(session_id):
+    user_id = session.get_user_id(session_id)
+
+    params = json.loads(request.data)
+    template_id = params["id"]
+
+    user_templates = people.get_user_items(
+        "select * from (" + consts.SQL_GET_USER_TEMPLATES + ") where ID = :template_id", user_id, None,
+        template_id=template_id)
+    if len(user_templates) == 0:
+        return "Access denied", 500
+    user_template = user_templates[0]
+
+    # params = json.loads(request.data)
+    template_code = params["code"].encode("utf-8")
+    template_name = params["name"]
+    template_project = params["project"]
+    main_path = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
+    file = open(main_path + '/templates/%s/template.py' % user_template['PATH'], 'w+')
+    # res = [{"name": o} for o in os.listdir(d) if os.path.isdir(os.path.join(d, o))]
+    file.write(template_code)
+    file.close()
+    template.update_table_template(template_id, NAME=template_name, PROJECT=template_project)
+    res = {}
+    # res['templates'] = people.get_user_items(consts.SQL_GET_USER_TEMPLATES, user_id, None)
+    return "OK"

@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Эти три строчки всегда в начале шаблона под макет
+# Эти! три строчки всегда в начале шаблона под макет
 from math import trunc  # trunc - отбрасывание дробной части. Просто если делишь то используй этот оператор
 
 from templates.Layer import ImageLayer, TextLayer, Layer

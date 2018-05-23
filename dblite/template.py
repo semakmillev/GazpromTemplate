@@ -24,10 +24,11 @@ def update_table_template(id, **kwargs):
     connection = create()
     c = connection.cursor()
     sql = ''
-    sql += 'update template set'
+    sql += 'update template set '
     sql += (',').join(k + ' = ?' for k, v in kwargs.iteritems())
     sql += '\twhere id = ?'
-    params = list(v for k, v in kwargs.iteritems()).append(id)
+    params = list(v for k, v in kwargs.iteritems())
+    params.append(id)
     c.execute(sql, params)
     c.close()
     connection.commit()

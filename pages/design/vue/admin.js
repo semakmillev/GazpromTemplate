@@ -8,6 +8,7 @@ var app = new Vue({
         companies: [],
         brands: [],
         templates: [],
+        projects:[],
         companyBrands: [],
         showArchiveBrands: false,
         brandTemplates: [],
@@ -58,9 +59,9 @@ var app = new Vue({
         },
         refreshBrandTemplates: function () {
             var main = this;
-            this.brandTemplates = this.templates.filter(template => (template["BRAND_ID"] == main.selectedBrand.ID)
-            )
-            ;
+
+            this.brandTemplates = this.templates.filter(template => (template["BRAND_ID"] == main.selectedBrand.ID));
+            this.projects = jQuery.unique(main.templates.map(function(t){return t.PROJECT}));
         },
         companyInfo: function (company) {
             this.selectedCompany = company;
@@ -71,6 +72,7 @@ var app = new Vue({
         brandInfo: function (brand) {
             this.selectedBrand = brand;
             this.refreshBrandTemplates();
+
             $("#brandInfoModal").modal('show');
         },
         addBrand: function () {
@@ -85,6 +87,15 @@ var app = new Vue({
                     // main.companyBrands = main.brands.filter(brand => (brand["COMPANY_ID"] == main.selectedCompany.ID))
                 });
 
+        },
+        saveBrand: function(){
+            let shArchivedBrands = 0;
+            let main = this;
+            if (this.showArchiveBrands) shArchivedBrands = 1;
+            brandModule.saveBrand(main.selectedBrand.ID, main.selectedBrand.NAME, shArchivedBrands)
+                .then(function(res){
+                   main.refreshCompanyBrands();
+                });
         },
         deleteBrand: function (brand) {
             var main = this;
@@ -218,6 +229,12 @@ var app = new Vue({
         ,
         saveTemplate: function () {
             var code = this.template_code;
+            let main = this;
+            templateModule.saveTemplate(main.selectedTemplate, main.template_code)
+                .then(function(){
+                    main.refreshBrandTemplates();
+                });
+            /*
             console.log(code);
             $.ajax({
                 type: "POST",
@@ -228,6 +245,7 @@ var app = new Vue({
             }).done(function (dt) {
                 $('#myModal').modal('hide');
             });
+            */
 
 
         }
