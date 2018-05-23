@@ -4,6 +4,7 @@ from server import template
 from server import brand
 from server import company
 from server import rules
+from server import dbbrowser
 
 if __name__ == '__main__':
     ## host='0.0.0.0'

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <script src="vue.js"></script>
+
+
+    <script src="bootstrap/js/jquery-3.3.1.min.js"></script>
+
+
+    <script src="sha256.js"></script>
+
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap/css/glyphicons.css">
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="js/brand.js"></script>
+    <script src="js/template.js"></script>
+    <!--<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">-->
+    <!--
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+    <!--
+    <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script type="text/javascript" src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="codemirror/lib/codemirror.css">
+    <script src="codemirror/lib/codemirror.js"></script>
+    <script src="codemirror/addon/edit/matchbrackets.js"></script>
+    <script src="codemirror/python/python.js"></script>
+    <style type="text/css">.CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}</style>
+    -->
+</head>
+<body>
+
+<div id="app">
+    <br>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12 col-sm-12">
+                <textarea class="form-control" v-model="sql" rows="5"></textarea>
+                <button class="btn btn-primary" v-on:click="executeScript()">Submit</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <table class="table">
+                    <th v-for="col in requestHeader">{{ col }}</th>
+
+                    <tr v-for="row in requestResult">
+                        <td v-for="cell in row">{{cell}}</td>
+
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<script src="vue/db.js">
+
+</script>
+<!--
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+-->
+
+
+</body>
+</html>
