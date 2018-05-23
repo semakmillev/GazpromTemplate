@@ -12,7 +12,7 @@ var app = new Vue({
         templates: [],
         previewImg: "",
         selectedTemplate: "",
-        selectedTemplateId : "",
+        selectedTemplateId: "",
         selectedBrand: "",
         selectedProject: "",
         loginEmail: "",
@@ -51,7 +51,7 @@ var app = new Vue({
             });
 
         },
-        selectTemplate: function(template){
+        selectTemplate: function (template) {
             console.log(template);
             this.selectedTemplate = template.NAME;
             this.selectedTemplateId = template.ID;
@@ -146,7 +146,7 @@ var app = new Vue({
             this.$route.push("/admin.html");
             //window.location.href = 'db.html';
         },
-        login: function(){
+        login: function () {
             var main = this;
             var email = main.loginEmail;
             var password = sha256.hex(main.loginPassword);
@@ -236,7 +236,7 @@ var app = new Vue({
 
             });
         },
-        preview: function(){
+        preview: function () {
             let main = this;
             let request_data = {
                 "width": this.template_width,
@@ -245,16 +245,16 @@ var app = new Vue({
                 "dpi": this.dpi
             };
             main.previewImg = "";
-            let modalHeight = this.template_height *(640/this.template_width);
+            let modalHeight = this.template_height * (640 / this.template_width);
             let modalWidth = 640;
 
             templateModule.preview(this.selectedTemplateId, request_data)
-                .then(function(res){
+                .then(function (res) {
                     main.previewImg = res;
                     $('#previewModal .modal-content').css('width', modalWidth);
-                    $('#previewModal .modal-content').css('height', modalHeight);
+                    $('#previewModal ').css('height', modalHeight);
                     $('#previewModal').modal('show');
-            });
+                });
         },
         downloadTemplate: function () {
             let main = this;
@@ -272,7 +272,7 @@ var app = new Vue({
                 "dpi": this.dpi
             };
             let http = new XMLHttpRequest();
-            http.open('POST', "../../server/generate/" + this.selectedTemplateId+"/"+session_id, true);
+            http.open('POST', "../../server/generate/" + this.selectedTemplateId + "/" + session_id, true);
             http.setRequestHeader("Content-type", "application/json; charset=utf-8");
             http.setRequestHeader("Content-length", request_data.length);
             http.setRequestHeader("Connection", "close");
@@ -334,20 +334,27 @@ var app = new Vue({
              data: JSON.stringify(request_data)
              });*/
         },
-        get_email_inviation: function(invitation_id){
-          return new Promise(function(resolve){
-              $.ajax({
-                  type: "GET",
-                  url: "../../server/invitation/" + invitation_id,
-                  data: {}
-              }).done(function (dt) {
-                  resolve(dt);
-              });
-          });
+        get_email_inviation: function (invitation_id) {
+            return new Promise(function (resolve) {
+                $.ajax({
+                    type: "GET",
+                    url: "../../server/invitation/" + invitation_id,
+                    data: {}
+                }).done(function (dt) {
+                    resolve(dt);
+                });
+            });
         },
         logout: function () {
             localStorage.removeItem("session_id");
             location.reload();
+        },
+        brandExists: function (arr, el) {
+            var i, l = arr.length;
+            for (i = 0; i < l; i++) {
+                if (arr[i]["ID"] == el["ID"]) return true;
+            }
+            return false;
         }
     },
 
@@ -355,29 +362,36 @@ var app = new Vue({
         let main = this;
         console.log("session:" + localStorage.getItem("session_id"));
         templateModule.getListOfTemplates()
-            .then(function(dt){
+            .then(function (dt) {
                 main.templates = dt["templates"];
-                main.brands = $.unique(main.templates.map(function (b) {return {'ID': b.BRAND_ID, 'NAME': b.BRAND_NAME};}));
+                main.templates.forEach(function (t) {
+                    let brand = {'ID': t.BRAND_ID, 'NAME': t.BRAND_NAME};
+                    if (!main.brandExists(main.brands, brand)) {
+                        // console.log(main.exists(main.brands, brand));
+                        main.brands.push(brand)
+                    }
+                });
+                // main.brands = JSON.parse($.unique(main.templates.map(function (b) {return JSON.stringify({'ID': b.BRAND_ID, 'NAME': b.BRAND_NAME});})));
             });
         /*
-        brandModule.getListOfBrands("user", false)
-            .then(function (dt) {
-                main.brands = dt['brands'];
-            });
-        */
+         brandModule.getListOfBrands("user", false)
+         .then(function (dt) {
+         main.brands = dt['brands'];
+         });
+         */
         if (localStorage.getItem("session_id") == null || localStorage.getItem("session_id") == "null") {
             let uri = window.location.search.substring(1);
             let params = new URLSearchParams(uri);
             let invitation = params.get("invitation");
-            if(invitation != null){
+            if (invitation != null) {
                 main.get_email_inviation(invitation)
-                    .then(function(res) {
+                    .then(function (res) {
                         main.registerEmail = res;
                         main.loginEmail = res;
                         main.openLogin();
                     })
                 ;
-            }else{
+            } else {
                 this.openLogin();
             }
             return;

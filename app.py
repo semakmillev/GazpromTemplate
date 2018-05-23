@@ -48,7 +48,8 @@ def get_resource(path):  # pragma: no cover
         ".html": "text/html",
         ".js": "application/javascript",
         ".png": "image/png",
-        ".jpg": "image/jpeg"
+        ".jpg": "image/jpeg",
+        '.svg': 'image/svg+xml'
     }
     complete_path = os.path.join(root_dir(), path)
     ext = os.path.splitext(path)[1]

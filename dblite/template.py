@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from dblite import create
 
 CREATE_SCRIPT = '''
@@ -9,10 +10,10 @@ CREATE TABLE template(
 '''
 
 
-def insert_table_template(name, brand_id, path):
+def insert_table_template(name, brand_id, path, project=u"без кампании"):
     connection = create()
     c = connection.cursor()
-    c.execute('insert into template (NAME,BRAND_ID,PATH) values (?,?,?)', (name, brand_id, path))
+    c.execute('insert into template (NAME,BRAND_ID,PATH, PROJECT) values (?,?,?,?)', (name, brand_id, path,project))
     last_id = c.lastrowid
     c.close()
     connection.commit()

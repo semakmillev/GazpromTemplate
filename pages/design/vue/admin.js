@@ -61,6 +61,7 @@ var app = new Vue({
             var main = this;
 
             this.brandTemplates = this.templates.filter(template => (template["BRAND_ID"] == main.selectedBrand.ID));
+            console.log(this.brandTemplates);
             this.projects = jQuery.unique(main.templates.map(function(t){return t.PROJECT}));
         },
         companyInfo: function (company) {

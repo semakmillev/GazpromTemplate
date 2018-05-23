@@ -7,6 +7,10 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
 
+symbols = (u"абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ",
+           u"abvgdeejzijklmnoprstufhzcss_y_euaABVGDEEJZIJKLMNOPRSTUFHZCSS_Y_EUA")
+tr = {ord(a):ord(b) for a, b in zip(*symbols)}
+
 from flask import jsonify, request
 from dblite import consts
 from app import app
@@ -86,15 +90,15 @@ def add_template(session_id):
     template_name = params["template_name"]
 
     path = "company_%03d" % user_brands[0]["COMPANY_ID"] + "/brand_%04d" % int(brand_id)
-    path = path + "/" + template_name
+    path = path + "/" + template_name.translate(tr).replace(" ","_")
     main_path = os.path.dirname(os.path.abspath(os.path.dirname(__file__))) + "/templates/"
     directory = main_path + path
 
     print directory
     if not os.path.exists(directory):
-        print "!!!"
-        os.makedirs(directory)
+        os.makedirs(directory+"/files")
         shutil.copyfile(main_path + "empty_template.py", main_path + path + "/template.py")
+        shutil.copyfile(main_path + "preview.jpg", main_path + path + "/files/preview.jpg")
         f = file(main_path + path + "/__init__.py", 'w')
         f.close()
         template.insert_table_template(template_name, brand_id, path)

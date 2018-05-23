@@ -45,17 +45,22 @@
 
 </style>
 <div id="app">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-sm navbar-light bg-light">
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
             </ul>
             <form class="form-inline my-2 my-lg-0">
-                <button type="button" class="btn btn-default" v-on:click="logout()">
+                <button type="button" class="btn btn-default btn-sm" v-on:click="logout()">
                     <span class="glyphicon glyphicon-log-out"></span> Log out
                 </button>
             </form>
         </div>
     </nav>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <img src="logo_gpn_rus_.svg"/>
+    </nav>
+    <hr>
+
     <div class="modal fade" id="loginModal" tabindex="-1" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -296,7 +301,10 @@
                         <div class="middle">
 
 
-                            <img v-for="img in imgs" class="mr-2 ml-2 mb-2" v-bind:src="img.PATH" v-on:click="selectTemplate(img)"/>
+                            <img v-for="img in imgs" class="mr-2 ml-2 mb-2"
+                                 v-bind:src="img.PATH" v-bind:alt="img.NAME"
+                                 data-toggle="tooltip" v-bind:title="img.NAME"
+                                 v-on:click="selectTemplate(img)"/>
                         </div>
                     </div>
                 </div>
