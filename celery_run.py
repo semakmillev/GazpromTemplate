@@ -14,9 +14,8 @@ app.conf.update(
 )
 
 app.conf.update(
-    task_routes = {
+    CELERY_ROUTES={
         'generate_picture': {'queue': 'TEMPLATE.Q'},
         'tasks.add': {'queue': 'hipri'},
     },
 )
-
