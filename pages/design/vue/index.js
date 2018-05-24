@@ -252,7 +252,7 @@ var app = new Vue({
                 .then(function (res) {
                     main.previewImg = res;
                     $('#previewModal .modal-content').css('width', modalWidth);
-                    $('#previewModal ').css('height', modalHeight);
+                    $('#previewModal .modal-content').css('height', modalHeight);
                     $('#previewModal').modal('show');
                 });
         },
