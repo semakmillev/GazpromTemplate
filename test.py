@@ -14,11 +14,10 @@ import sqlite3
 from dblite.consts import SQL_GET_USER_COMPANIES
 
 
+a = [{'id':1, 'name':"semak"}, {'id':2, 'name':"ter"}]
+r = [row for row in a if row['id'] == 3]
 
 
-path = '/media/semak/DATA/Development/GazpromTemplate/templates/first/'
-files = [f for f in os.listdir(path)if os.path.isfile(path+f)]
-print files
 '''
 f = file("db_creator/rules.json")
 

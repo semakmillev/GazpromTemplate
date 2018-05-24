@@ -1,10 +1,33 @@
-# -*- coding: UTF-8 -*-
-import imp
 import os
 import uuid
-from subprocess import call
 from time import sleep
+
+import imp
+
+import celery
 from PIL import ImageCms, ImageChops
+from subprocess import call
+
+
+
+import sys
+#sys.path.insert(0, '../templates')
+from celery.result import AsyncResult
+
+sys.path.append('../')
+#from .templates import *
+from dblite import task
+from templates.Layer import Layer
+from celery_run import app
+
+
+@app.task(bind=True)
+def add(self, x, y):
+    print self.request.id
+    sleep(3)
+    return x + y
+
+# from engine import generate_picture as gen
 
 
 def combine_layers(background, foreground_layer):
@@ -31,20 +54,20 @@ def combine_layers(background, foreground_layer):
         background = foreground_layer.add_to_image(background)
     return background
 
-
-def generate_picture(template_path, width, height, output="JPEG", resolution=60.0, user_id=None, preview=False, ):
+@app.task(bind=True, name="generate_picture")
+def generate_picture(self, template_path, width, height, output="JPEG", resolution=60.0, user_id=None, preview=False):
     extension = output.replace("JPEG", "JPG").lower()
     uid = str(uuid.uuid4())
     if preview:
-        file_name = os.path.dirname(__file__) + "/pages/design/preview_" + str(user_id) + "_" + uid + "." + extension
+        file_name = os.path.dirname(os.path.dirname(__file__)) + "/pages/design/preview_" + str(user_id) + "_" + uid + "." + extension
     else:
-        file_name = os.path.dirname(__file__) + "/result_" + str(user_id) + "_" + uid + "." + extension
+        file_name = os.path.dirname(os.path.dirname(__file__)) + "/pages/design/result/result_" + str(user_id) + "_" + uid + "." + extension
 
     f = open(file_name, 'a')
-    from templates.Layer import Layer
+
     Layer.image_height = int(height)
     Layer.image_width = int(width)
-    a = os.path.abspath(os.path.dirname(__file__)) + "/templates/%s/template.py" % template_path
+    a = os.path.dirname(os.path.abspath(os.path.dirname(__file__))) + "/templates/%s/template.py" % template_path
     print a
     foo = imp.load_source("Layer", a)
     layers = foo.layers
@@ -55,8 +78,6 @@ def generate_picture(template_path, width, height, output="JPEG", resolution=60.
         i += 1
         final = combine_layers(final, layer)
     f.close()
-    # final = final.convert('RGB')
-    # final = final.convert('CMYK')
 
     from_ = ImageCms.get_display_profile()
 
@@ -75,31 +96,8 @@ def generate_picture(template_path, width, height, output="JPEG", resolution=60.
         s = "exiftool -XResolution=%s -YResolution=%s %s" % (int(resolution), int(resolution), file_name)
         print "!"
         call(s, shell=True)
-
     # final.save(file_name, output)
-    print "!!!"
+    task_id = self.request.id
+    print task_id
+    task.set_status('%s'%task_id,'SUCCESS',file_name)
     return file_name
-
-
-# layer1 = layers[0]
-
-
-
-
-'''
-im = Image.open("template/G-Energy-F-Synth-5W-40-4L.png")
-font = truetype(font="template/DINProRegular.ttf", size=108)
-ascent, descent = font.getmetrics()
-(width, baseline), (offset_x, offset_y) = font.font.getsize("test")
-print ascent - offset_y
-
-draw = Draw(im)
-draw.text((0, 0), "Sample Text", (255, 255, 0), font=font)
-im.save("out.png")
-'''
-# im = im.resize((100, 200))
-# l = layers[0]
-# print l
-'''
-
-'''

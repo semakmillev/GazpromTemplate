@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
 
-import main
 from flask import Flask, request, Response, jsonify, send_file
 from werkzeug.utils import secure_filename
 from dblite import *
@@ -13,6 +12,7 @@ from dblite import people
 from dblite import session
 from dblite.consts import SQL_GET_USER_TEMPLATES
 from model import parse_template_request
+from queue import tasks
 
 UPLOAD_FOLDER = os.path.abspath(os.path.dirname(__file__)) + '/templates'
 app = Flask(__name__)
@@ -146,6 +146,8 @@ def set_template_code(template_name):
 
 
 
+
+
 @app.route('/server/generate/<template_id>/<session_id>', methods=['POST'])
 def generate_template(template_id, session_id):
     user_id = session.get_user_id(session_id)
@@ -160,6 +162,7 @@ def generate_template(template_id, session_id):
         print "Access denied"
         return "Access denied", 500
     user_template = user_templates[0]
+
     file_name = main.generate_picture(user_template["PATH"], template_request.width, template_request.height,
                                       template_request.format, float(template_request.dpi), user_id=user_id)
     return send_file(file_name), 200
@@ -181,7 +184,7 @@ def generate_template_preview(template_id, session_id):
 
     template_request.height = int(template_request.height * 640 / template_request.width)
     template_request.width = 640
-    file_name = main.generate_picture(user_template["PATH"], template_request.width, template_request.height,
+    file_name = tasks.generate_picture(user_template["PATH"], template_request.width, template_request.height,
                                       "JPEG", float(96), user_id=user_id, preview=True)
     return os.path.basename(file_name), 200
 

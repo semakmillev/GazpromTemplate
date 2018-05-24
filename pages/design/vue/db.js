@@ -10,6 +10,9 @@ var app = new Vue({
         requestHeader: []
     },
     methods: {
+        spin: function(){
+            NProgress.start();
+        },
         executeScript: function(){
             let main = this;
             let session_id = localStorage.getItem("session_id");

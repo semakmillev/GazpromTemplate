@@ -109,7 +109,8 @@ var templateModule ={
                 resolve(dt);
             });
         });
-    }
+    },
+    
 
 
 }

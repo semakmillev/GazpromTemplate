@@ -20,6 +20,7 @@ var app = new Vue({
         registerEmail: "",
         brands: [],
         projects: [],
+        tasks: [],
         registerPassword: "",
         repeatRegisterPassword: "",
         template_height: 500,
@@ -247,15 +248,131 @@ var app = new Vue({
             main.previewImg = "";
             let modalHeight = this.template_height * (640 / this.template_width);
             let modalWidth = 640;
-
+            startLoading();
             templateModule.preview(this.selectedTemplateId, request_data)
                 .then(function (res) {
+
                     main.previewImg = res;
                     $('#previewModal .modal-content').css('width', modalWidth);
                     $('#previewModal .modal-content').css('height', modalHeight);
+                    stopLoading();
                     $('#previewModal').modal('show');
                 });
         },
+        refreshTask(task){
+            let main = this;
+            console.log(main.tasks);
+            let session_id = localStorage.getItem("session_id");
+            console.log(task);
+            $.ajax({
+                type: "GET",
+                url: "../../server/async/tasks/refresh/" + session_id,
+                data:{task_id: task['task_id']}
+            }).done(function (dt) {
+                let index = main.tasks.findIndex(el => el['task_id'] == task['task_id']);
+                console.log(index);
+                console.log(dt);
+                console.log(main.tasks);
+                main.tasks[index] = dt;
+                main.tasks.splice();
+                ///task = dt;
+
+            });
+        },
+        getUserTasks: function() {
+            let main = this;
+            let session_id = localStorage.getItem("session_id");
+            $.ajax({
+                type: "GET",
+                url: "../../server/async/tasks/" + session_id
+            }).done(function (dt) {
+                main.tasks = dt;
+            });
+
+        },
+        generateTemplate: function(){
+            let session_id = localStorage.getItem("session_id");
+            let request_data = {
+                "width": this.template_width,
+                "height": this.template_height,
+                "format": this.format,
+                "dpi": this.dpi
+            };
+            let main = this;
+            $.ajax({
+                type: "POST",
+                url: "../../server/async/tasks/" + this.selectedTemplateId +"/" + session_id,
+                contentType: "application/json",
+                data: JSON.stringify(request_data)
+            }).done(function (dt) {
+                main.getUserTasks();
+            });
+        },
+        downloadTask:function(task){
+            let main = this;
+            console.log(task);
+
+            let session_id = localStorage.getItem("session_id");
+            let extension = this.format.replace("JPEG", "JPG").toLowerCase();
+            let file_name = task.info.replaceAll(" ","_").replaceAll(",","");
+            let request_data = {
+                "task_id": task.task_id
+            };
+            let http = new XMLHttpRequest();
+            http.open('POST', "../../server/async/tasks/download/" + session_id, true);
+            http.setRequestHeader("Content-type", "application/json; charset=utf-8");
+            http.setRequestHeader("Content-length", request_data.length);
+            http.setRequestHeader("Connection", "close");
+            http.responseType = "blob";
+            http.onload = function () {
+                if (this.status === 200) {
+                    let filename = file_name + "." + extension;
+                    let disposition = http.getResponseHeader('Content-Disposition');
+                    if (disposition && disposition.indexOf('attachment') !== -1) {
+                        var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                        var matches = filenameRegex.exec(disposition);
+                        if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
+                    }
+                    var type = http.getResponseHeader('Content-Type');
+                    var blob = typeof File === 'function'
+                        ? new File([this.response], filename, {type: type})
+                        : new Blob([this.response], {type: type});
+                    if (typeof window.navigator.msSaveBlob !== 'undefined') {
+                        // IE workaround for "HTML7007: One or more blob URLs were revoked by closing the blob for which they were created. These URLs will no longer resolve as the data backing the URL has been freed."
+                        window.navigator.msSaveBlob(blob, filename);
+                    } else {
+                        var URL = window.URL || window.webkitURL;
+                        var downloadUrl = URL.createObjectURL(blob);
+
+                        if (filename) {
+                            // use HTML5 a[download] attribute to specify filename
+                            var a = document.createElement("a");
+                            // safari doesn't support this yet
+                            if (typeof a.download === 'undefined') {
+                                window.location = downloadUrl;
+                            } else {
+                                a.href = downloadUrl;
+                                a.download = filename;
+                                document.body.appendChild(a);
+                                a.click();
+                            }
+                        } else {
+                            window.location = downloadUrl;
+                        }
+
+                        setTimeout(function () {
+                            URL.revokeObjectURL(downloadUrl);
+                        }, 100); // cleanup
+                    }
+                }
+            };
+            //http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            http.onreadystatechange = function () {
+
+            };
+            http.send(JSON.stringify(request_data));
+        },
+
         downloadTemplate: function () {
             let main = this;
             console.log(this.selectedTemplateId);
@@ -404,6 +521,7 @@ var app = new Vue({
             data: []
         }).done(function (dt) {
             main.items = dt;
+            main.getUserTasks();
         });
 
     }
